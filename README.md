@@ -1,2 +1,2 @@
 # Stoic
-Browser extensions that hides distracting or unneccessary elements to help you regain focus
+Browser extensions that hides distracting and unneccessary elements to help you regain focus
