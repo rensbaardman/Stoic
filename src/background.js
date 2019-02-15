@@ -21,6 +21,9 @@ if (typeof browser === undefined) {
 	}
 }
 // TODO: somehow atomize this and place in utils (but should also work outside of that)
+// TODO: consider just checking for 'typeof chrome !== undefined', but note that the
+// chrome-namespace is also defined outside of extensions (just in a smaller version)
+
 
 function blabla(integer) {
 	return 2 * integer

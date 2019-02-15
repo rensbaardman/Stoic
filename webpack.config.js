@@ -14,6 +14,23 @@ let version = package.version; // TODO: not necessarily path-friendly
 let name = package.name; // TODO: not necessarily path-friendly
 
 
+function build_manifest(buffer) {
+
+	var manifest = JSON.parse(buffer.toString());
+
+	manifest.name = name;
+	manifest.version = version;
+
+	// pretty print with 2 spaces (second argument is transform:
+	// does nothing when 'null')
+	manifest_JSON = JSON.stringify(manifest, null, 2)
+
+	return manifest_JSON;
+
+}
+
+
+
 module.exports = function(environment) {
 
 	let target = environment;
@@ -34,22 +51,12 @@ module.exports = function(environment) {
 	
 		entry: {
 			"background": "./src/background.js",
-			"popup/popup": "./src/popup/popup.js",
-			"manifest": "./src/manifest.json" 
+			"popup/popup": "./src/popup/popup.js"
 		},
 
 		output: {
 			path: build_dir,
 			filename: "[name].js"
-		},
-
-		module: {
-			rules: [{
-				test: /manifest.json$/,
-				use: [{
-					loader: path.resolve('tools/manifest-loader.js')
-				}]
-			}]
 		},
 
 		optimization: {
@@ -58,6 +65,13 @@ module.exports = function(environment) {
 
 		plugins: [
 			new CopyWebpackPlugin([
+			{
+				from: "./src/manifest.json",
+				to: `${build_dir}/manifest.json`,
+				transform (content, path) {
+					return build_manifest(content)
+				}
+			},
 			{
 				from: './src/popup/popup.html',
 				to: `${build_dir}/popup`,
