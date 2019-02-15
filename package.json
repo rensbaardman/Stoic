@@ -29,11 +29,16 @@
 	},
 	"scripts": {
 		"test": "npm-run-all test:unit-browser test:functional",
+
 			"test:unit": "mocha --recursive test/unit",
-			"test:unit:watch": "npm run test:unit -- --watch",
+				"test:unit:watch": "npm run test:unit -- --watch",
 			"test:unit-browser": "karma start",
-			"test:unit-browser:watch": "npm run test:unit-browsers -- --auto-watch --no-single-run",
-			"test:functional": "mocha --recursive test/functional",
+				"test:unit-browser:watch": "npm run test:unit-browsers -- --auto-watch --no-single-run",
+
+			"test:functional": "npm-run-all test:functional:*",
+				"test:functional:firefox": "npm run build:firefox && SELENIUM_BROWSER=firefox mocha --recursive test/functional",
+				"test:functional:chrome":  "npm run build:chrome  && SELENIUM_BROWSER=chrome  mocha --recursive test/functional",
+
 		"build": "npm-run-all build:*",
 			"build:firefox": "webpack --env firefox",
 			"build:chrome": "webpack --env chrome"

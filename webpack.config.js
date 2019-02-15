@@ -14,12 +14,23 @@ let version = package.version; // TODO: not necessarily path-friendly
 let name = package.name; // TODO: not necessarily path-friendly
 
 
-function build_manifest(buffer) {
+function build_manifest(buffer, target) {
 
 	var manifest = JSON.parse(buffer.toString());
 
 	manifest.name = name;
 	manifest.version = version;
+
+	// TODO: this is wrong ('applications' instead of
+	// 'browser_specific_settings'), and unnecessary since we don't
+	// need an ID. But Selenium geckodriver insists.
+	if (target === 'firefox') {
+		manifest.applications = {
+			"gecko": {
+				"id": "Stoic@rensbaardman.nl"
+			}
+		}
+	}
 
 	// pretty print with 2 spaces (second argument is transform:
 	// does nothing when 'null')
@@ -37,6 +48,13 @@ module.exports = function(environment) {
 	if (!['firefox', 'chrome'].includes(target)) {
 		console.log(`Error: target ${target} is not 'firefox' or 'chrome'`)
 		throw `${target} is not 'firefox' or 'chrome'`
+	}
+
+	if (target === 'firefox') {
+		var ext = 'xpi'
+	}
+	else if (target === 'chrome') {
+		var ext = 'zip'
 	}
 
 	let build_name = `${name}-${version}-${target}`;
@@ -69,13 +87,18 @@ module.exports = function(environment) {
 				from: "./src/manifest.json",
 				to: `${build_dir}/manifest.json`,
 				transform (content, path) {
-					return build_manifest(content)
+					return build_manifest(content, target)
 				}
 			},
 			{
 				from: './src/popup/popup.html',
 				to: `${build_dir}/popup`,
 				toType: 'dir'			
+			},
+			{
+				from: "./assets/stoic-48.png",
+				to: `${build_dir}/assets`,
+				toType: 'dir'
 			}]),
 
 			new CleanWebpackPlugin([build_dir], {
@@ -84,7 +107,8 @@ module.exports = function(environment) {
 
 			new ZipPlugin({
 				path: "../",
-				filename: build_name
+				filename: build_name,
+				extension: ext
 			})
 		]
 	};

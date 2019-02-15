@@ -9,7 +9,7 @@ npm run test:unit-browser
 unit testing with Firefox (current and Beta) and Chrome ()
 
 note the different terminology in Release channels
-Firefox: Nightly -> Developer Edition -> Beta -> Stable
+Firefox: Nightly -> Developer Edition (Aurora) -> Beta -> Stable
 Chrome: Canary -> Dev -> Beta -> Stable
 we are interested in the upcoming (next 1 or 2 months) release, but as it would be for users, not for developers. That means Beta. E.g. Developer Edition in Firefox allows unsigned extensions. We want to make sure that our extension is properly signed! Thus we would want to catch this bug.
     ---> actually might not be such a problem, see

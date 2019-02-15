@@ -3,63 +3,102 @@ var assert = require('chai').assert;
 
 const {Builder, By, Key, until} = require('selenium-webdriver');
 
+let package = require('../../package.json');
 
-describe('tautology', function() {
+let firefox = require('selenium-webdriver/firefox');
+let chrome = require('selenium-webdriver/chrome');
 
-	it('should be true', function() {
-		assert.isTrue(true);
-	})
+firefox_options = new firefox.Options();
+// TODO find a way to load unsigned extensions as temporary extensions in default Firefox
+// see https://support.mozilla.org/en-US/kb/add-on-signing-in-firefox
+// cf what web-ext does
+// cf this issue (undocumented commands?)
+// https://github.com/mozilla/geckodriver/issues/473
+firefox_options
+	.addExtensions('build/Stoic-0.0.0-firefox.xpi')
+	.setBinary(firefox.Channel.AURORA)
+	.setPreference('xpinstall.signatures.required', false)
+chrome_options = new chrome.Options();
+chrome_options.addExtensions('build/Stoic-0.0.0-chrome.zip')
 
-})
+async function test() {
+	driver = await new Builder()
+		.setFirefoxOptions(firefox_options)
+		.setChromeOptions(chrome_options)
+		.build();
+}
 
+test()
 
-describe('Google.com', function() {
+// TODO: find the best way to test the plugin - no access to the extension itself! ...
+// either use a visual framework (very involved), or do partial checking with direct urls, e.g.
+// moz-extension://b6c71c21-ba10-1d40-b0b6-15a9a83ffd31/popup/popup.html
+// or see what is possible with more advanced webdriver functionality
+// there seem to be behind-the-screens possibilities
+// see e.g 
+// other issue:
+// https://github.com/seleniumhq/selenium-google-code-issue-archive/issues/7805
+// comparable method
+// https://www.blazemeter.com/blog/6-easy-steps-testing-your-chrome-extension-selenium
 
-	this.timeout(10000);
+// describe('tautology', function() {
 
-	var driver;
+// 	it('should be true', function() {
+// 		assert.isTrue(true);
+// 	})
 
-	before(async function() {
-		driver = await new Builder()
-			.forBrowser('firefox')
-			.build();		
-	})
-
-	after(async function() {
-		await driver.quit()
-	})
-
-	describe('searchpage', function() {
-
-		it('should look up searchwords', async function() {
-
-			await driver.get('http://www.google.com');
-
-			const inputbox = await driver.findElement(By.name('q'))
-
-			await inputbox.sendKeys('an example search');
-			await inputbox.sendKeys(Key.RETURN);
-
-
-			await driver.wait(until.titleIs('an example search - Google zoeken'), 1000)
-
-		});
-
-		it('should look up test searchwords', async function() {
-
-			await driver.get('http://www.google.com');
-
-			const inputbox = await driver.findElement(By.name('q'))
-
-			await inputbox.sendKeys('test');
-			await inputbox.sendKeys(Key.RETURN);
-
-			await driver.wait(until.titleIs('test - Google zoeken'), 1000)
+// })
 
 
-		});
+// describe('Google.com', function() {
 
-	});
+// 	this.timeout(10000);
 
-});
+// 	var driver;
+
+// 	before(async function() {
+// 		driver = await new Builder()
+// 			.forBrowser('firefox')
+// 			.setFirefoxOptions(firefox_options)
+// 			.setChromeOptions(chrome_options)
+// 			.build();		
+// 	})
+
+// 	// after(async function() {
+// 	// 	await driver.quit()
+// 	// })
+
+// 	describe('searchpage', function() {
+
+// 		it('should look up searchwords', async function() {
+
+// 			await driver.get('http://www.google.com');
+
+// 			const inputbox = await driver.findElement(By.name('q'))
+
+// 			await inputbox.sendKeys('an example search');
+// 			await inputbox.sendKeys(Key.RETURN);
+
+
+// 			await driver.wait(until.titleIs('an example search - Google zoeken'), 1000)
+
+// 		});
+
+// 		it('should look up test searchwords', async function() {
+
+// 			await driver.get('http://www.google.com');
+
+// 			const inputbox = await driver.findElement(By.name('q'))
+
+// 			await inputbox.sendKeys('test');
+// 			await inputbox.sendKeys(Key.RETURN);
+
+// 			await driver.wait(until.titleIs('test - Google zoeken'), 1000)
+
+
+// 		});
+
+// 	});
+
+// });
 

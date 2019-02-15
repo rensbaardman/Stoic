@@ -4,6 +4,11 @@
 
 	"background": {
 		"scripts": ["background.js"]
+	},
+
+	"browser_action": {
+		"default_popup": "popup/popup.html",
+		"default_icon": "assets/stoic-48.png"
 	}
 
 }
