@@ -54,7 +54,7 @@ module.exports = function(environment) {
 		var ext = 'xpi'
 	}
 	else if (target === 'chrome') {
-		var ext = 'zip'
+		var ext = 'crx'
 	}
 
 	let build_name = `${name}-${version}-${target}`;

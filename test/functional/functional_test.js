@@ -1,12 +1,19 @@
+let fs = require('fs');
+
 var should = require('chai').should();
 var assert = require('chai').assert;
 
 const {Builder, By, Key, until} = require('selenium-webdriver');
+let firefox = require('selenium-webdriver/firefox');
+let chrome = require('selenium-webdriver/chrome');
 
 let package = require('../../package.json');
 
-let firefox = require('selenium-webdriver/firefox');
-let chrome = require('selenium-webdriver/chrome');
+
+function file_to_buffer(file) {
+	var file = fs.readFileSync(file);
+	return Buffer.from(file).toString('base64');
+}
 
 firefox_options = new firefox.Options();
 // TODO find a way to load unsigned extensions as temporary extensions in default Firefox
@@ -18,14 +25,21 @@ firefox_options
 	.addExtensions('build/Stoic-0.0.0-firefox.xpi')
 	.setBinary(firefox.Channel.AURORA)
 	.setPreference('xpinstall.signatures.required', false)
+
 chrome_options = new chrome.Options();
-chrome_options.addExtensions('build/Stoic-0.0.0-chrome.zip')
+chrome_options
+	.addExtensions(file_to_buffer('build/Stoic-0.0.0-chrome.crx'))
+
 
 async function test() {
 	driver = await new Builder()
 		.setFirefoxOptions(firefox_options)
 		.setChromeOptions(chrome_options)
 		.build();
+}
+
+function open_popup_page(driver) {
+
 }
 
 test()
