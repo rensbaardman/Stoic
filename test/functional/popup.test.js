@@ -56,7 +56,15 @@ describe('popup', function() {
 		await driver.get('http://google.com');
 		await open_in_new_tab(driver, popup_url);
 
-		await driver.sleep(5000);
+		try {
+			var element = await driver.findElement(By.css('#url'));
+		}
+		catch (error) {
+			assert.fail(`Should not have raised ${error}`);
+		}
+
+		let content = await element.getText();
+		expect(content).to.include('google.com')
 
 	})
 

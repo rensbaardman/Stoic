@@ -15,8 +15,8 @@ describe('Index', function() {
 	describe('blabla', function() {
 
 		it('should double the input', function() {
-			assert.equal(index.blabla(1), 2);
-			assert.equal(index.blabla(-1), -2);
+			assert.equal(background.blabla(1), 2);
+			assert.equal(background.blabla(-1), -2);
 		});
 
 	});
