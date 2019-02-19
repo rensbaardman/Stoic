@@ -17,16 +17,14 @@ describe('popup', function() {
 			.setFirefoxOptions(firefox_options)
 			.setChromeOptions(chrome_options)
 			.build();
-		await console.log('driver built');
 		popup_url = await get_popup_url(driver);
-		await console.log('popup_url fetched');
 
 	})
 
 	afterEach(async function() {
 
 		// close all windows in a safe manner:
-		// leave on 'about:blank'-tab open, so the
+		// leave one 'about:blank'-tab open, so the
 		// session stays alive.
 		const handles = await driver.getAllWindowHandles();
 		for (let handle of handles) {

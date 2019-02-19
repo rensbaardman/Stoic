@@ -50,9 +50,7 @@ async function get_extension_id(driver) {
 	let browser_name = await get_browser_name(driver);
 
 	if (browser_name === 'firefox') {
-		await console.log('its firefox')
 		await open_in_new_tab(driver, 'about:debugging#addons');
-		await console.log('opened in new tab')
 		// TODO: the manifest ID Stoic@rensbaardman.nl gets injected in build_manifest() in webpack.config.js;
 		// try to get that one out (or at least move to manifest.json or something like APP_INFO)
 		let element = await driver.findElement(By.css('li[data-addon-id="Stoic@rensbaardman.nl"] dd.internal-uuid span:first-child'))
@@ -61,7 +59,7 @@ async function get_extension_id(driver) {
 		return id;
 	} else if (browser_name === 'chrome') {
 	
-		await open_in_new_tab(driver, 'chrome://extensions/')
+		await open_in_new_tab(driver, 'chrome://extensions/');
 
 		let extensions_manager    = await driver.findElement(By.css('extensions-manager'));
 		let extensions_manager_SR = await get_shadow_root(driver, extensions_manager);
@@ -76,10 +74,11 @@ async function get_extension_id(driver) {
 			let name_element = await extension_SR.findElement(By.css('#name'))
 			let ext_name = await name_element.getText()
 
+			// 'name' is extracted from package.json
 			if (ext_name === name) {
 				let id = await extension.getAttribute('id');
 				await safe_close_current_window(driver);
-				return extension.getAttribute('id');
+				return id;
 			}
 		}
 	} else {
