@@ -23,7 +23,7 @@ describe('Stoic', function() {
 
 	describe('popup', function() {
 
-		it('should say "Hello World!', async function() {
+		it('should say "Hello World!"', async function() {
 
 			await open_popup_page(driver);
 

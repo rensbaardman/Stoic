@@ -28,7 +28,7 @@
 		"zip-webpack-plugin": "^3.0.0"
 	},
 	"scripts": {
-		"test": "npm-run-all test:unit-browser test:functional",
+		"test": "npm-run-all test:unit-browser test:func",
 
 			"test:unit": "mocha --recursive test/unit",
 				"test:unit:watch": "npm run test:unit -- --watch",
@@ -37,11 +37,11 @@
 
 			"test:func": "npm-run-all test:func:*",
 				"test:func:firefox": "npm run build:firefox && SELENIUM_BROWSER=firefox mocha --recursive test/functional",
-				"test:func:chrome": "npm run build:chrome  && SELENIUM_BROWSER=chrome  mocha --recursive test/functional",
+				"test:func:chrome":  "npm run build:chrome  && SELENIUM_BROWSER=chrome  mocha --recursive test/functional",
 
 		"build": "npm-run-all build:*",
 			"build:firefox": "webpack --env firefox",
-			"build:chrome": "webpack --env chrome"
+			"build:chrome":  "webpack --env chrome"
 	},
 	"private": true
 }

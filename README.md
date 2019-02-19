@@ -6,7 +6,7 @@ npm run test:unit
 unit testing with the Node.js-engine (fast, but doesn't catch quirks in browser implementations)
 
 npm run test:unit-browser
-unit testing with Firefox (current and Beta) and Chrome ()
+unit testing with Firefox and Chrome
 
 note the different terminology in Release channels
 Firefox: Nightly -> Developer Edition (Aurora) -> Beta -> Stable
@@ -45,22 +45,12 @@ https://stackoverflow.com/questions/10541225/cross-browser-testing-all-major-bro
 
 makes a solid point: since Chrome and Firefox are updated automatically, browser share for outdated versions is very low
 
-## misc
-probably have to recreate some of the functionality of `web-ext`, unfortunately, but then cross-browser.
-at least the bundle thingy
 
 ## todo
-check Greenkeeper or similar
-check Travis or other CI
-check BrowserStack: https://docs.travis-ci.com/user/browserstack/ or SauceLabs or Lambdatest https://www.lambdatest.com/
-
-reconsider this: https://devhub.io/repos/PixnBits-karma-selenium-webdriver-launcher
-how is this supposed to work?
-
-check: currently an alpha version of selenium-webdriver installed
-
-todo one day: how to deal with npm-dependencies (e.g. leftpad-scenario)
-
-for browser profiles: check locale options
-
-check sublime integration with stuff (possibly run npm commands; integrated js linter)
+- check Greenkeeper or similar
+- check Travis or other CI
+- check BrowserStack: https://docs.travis-ci.com/user/browserstack/ or SauceLabs or Lambdatest https://www.lambdatest.com/
+- check: currently an alpha version of selenium-webdriver installed
+- todo one day: how to deal with npm-dependencies (e.g. leftpad-scenario)
+- check sublime integration with stuff (possibly run npm commands; integrated js linter)
+- install linter
