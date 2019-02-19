@@ -1,4 +1,4 @@
-var index = require('../../src/background.js');
+var background = require('../../src/background.js');
 
 var assert = require('chai').assert;
 
