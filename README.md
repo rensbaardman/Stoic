@@ -1,5 +1,5 @@
 # Stoic
-Browser extensions that hides distracting and unneccessary elements to help you regain focus
+Browser extension that hides distracting and unneccessary elements to help you regain focus
 
 ### Commands
 npm run test:unit
@@ -54,3 +54,7 @@ makes a solid point: since Chrome and Firefox are updated automatically, browser
 - todo one day: how to deal with npm-dependencies (e.g. leftpad-scenario)
 - check sublime integration with stuff (possibly run npm commands; integrated js linter)
 - install linter
+- I am still not very happy with the unit testing (even with manual `browser`-fakes). Since there are a lot of things that can go wrong:
+    - did I correctly fake the browser-api?
+    - did we request the correct permissions? (now there is no direct test for this!)
+the only way to proper test this is to do some kind of integration tests within the popup/extension-scope. But then there is still some awkward parallel testing. What if we forget to request the right permissions, and/or forget the integration tests for that? Or the reverse scenario (we drop a requirement, but still test for it).

@@ -6,12 +6,12 @@ module.exports = function(config) {
     frameworks: ['mocha'],
 
     files: [
-      'test/unit/*_test.js'
+      'test/unit/*.test.js'
     ],
 
     preprocessors: {
       // add webpack as preprocessor
-      'test/unit/*_test.js': [ 'webpack' ]
+      'test/unit/*.test.js': [ 'webpack' ]
     },
 
     webpack: {

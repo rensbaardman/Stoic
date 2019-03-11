@@ -21,7 +21,10 @@
 		"karma-webpack": "^3.0.5",
 		"mocha": "^5.2.0",
 		"npm-run-all": "^4.1.5",
+		"rewire": "^4.0.1",
 		"selenium-webdriver": "^4.0.0-alpha.1",
+		"sinon": "^7.2.7",
+		"sinon-chrome": "^2.3.2",
 		"web-ext": "^2.9.3",
 		"webpack": "^4.29.0",
 		"webpack-cli": "^3.2.1",
@@ -29,19 +32,16 @@
 	},
 	"scripts": {
 		"test": "npm-run-all test:unit-browser test:func",
-
-			"test:unit": "mocha --recursive test/unit",
-				"test:unit:watch": "npm run test:unit -- --watch",
-			"test:unit-browser": "karma start",
-				"test:unit-browser:watch": "npm run test:unit-browsers -- --auto-watch --no-single-run",
-
-			"test:func": "npm-run-all test:func:*",
-				"test:func:firefox": "npm run build:firefox && SELENIUM_BROWSER=firefox mocha --recursive test/functional",
-				"test:func:chrome":  "npm run build:chrome  && SELENIUM_BROWSER=chrome  mocha --recursive test/functional",
-
+		"test:unit": "mocha --recursive test/unit",
+		"test:unit:watch": "npm run test:unit -- --watch",
+		"test:unit-browser": "karma start",
+		"test:unit-browser:watch": "npm run test:unit-browsers -- --auto-watch --no-single-run",
+		"test:func": "npm-run-all test:func:*",
+		"test:func:firefox": "npm run build:firefox && SELENIUM_BROWSER=firefox mocha --recursive test/functional",
+		"test:func:chrome": "npm run build:chrome  && SELENIUM_BROWSER=chrome  mocha --recursive test/functional",
 		"build": "npm-run-all build:*",
-			"build:firefox": "webpack --env firefox",
-			"build:chrome":  "webpack --env chrome"
+		"build:firefox": "webpack --env firefox",
+		"build:chrome": "webpack --env chrome"
 	},
 	"private": true
 }
