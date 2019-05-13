@@ -2,10 +2,10 @@
 Browser extension that hides distracting and unneccessary elements to help you regain focus
 
 ### Commands
-npm run test:unit
+`npm run test:unit`
 unit testing with the Node.js-engine (fast, but doesn't catch quirks in browser implementations)
 
-npm run test:unit-browser
+`npm run test:unit-browser`
 unit testing with Firefox and Chrome
 
 note the different terminology in Release channels
@@ -58,3 +58,4 @@ makes a solid point: since Chrome and Firefox are updated automatically, browser
     - did I correctly fake the browser-api?
     - did we request the correct permissions? (now there is no direct test for this!)
 the only way to proper test this is to do some kind of integration tests within the popup/extension-scope. But then there is still some awkward parallel testing. What if we forget to request the right permissions, and/or forget the integration tests for that? Or the reverse scenario (we drop a requirement, but still test for it).
+- make webpack ignore the WARNING with `const popup = require(popup_src_path);`

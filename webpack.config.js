@@ -1,3 +1,5 @@
+// Webpack configuration for building the extension
+
 const path = require('path');
 
 var webpack = require('webpack');
