@@ -1,5 +1,6 @@
 const popup_src_path = '../../src/popup/popup.js'
-const popup = require(popup_src_path);
+// const popup = require(popup_src_path);
+const popup = require('../../src/popup/popup.js') // make webpack happy
 const expect = require('chai').expect;
 const assert = require('chai').assert;
 const sinon = require('sinon');

@@ -2,19 +2,18 @@
 
 const path = require('path');
 
-var webpack = require('webpack');
+const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-var ZipPlugin = require('zip-webpack-plugin');
+const ZipPlugin = require('zip-webpack-plugin');
+
+const package = require('./package.json');
+const version = package.version; // TODO: not necessarily path-friendly
+const name = package.name; // TODO: not necessarily path-friendly
+
 
 function absolute(relative_path) {
 	return path.resolve(__dirname, relative_path)
 }
-
-let package = require('./package.json');
-let version = package.version; // TODO: not necessarily path-friendly
-let name = package.name; // TODO: not necessarily path-friendly
-
 
 function build_manifest(buffer, target) {
 
@@ -42,8 +41,6 @@ function build_manifest(buffer, target) {
 
 }
 
-
-
 module.exports = function(environment) {
 
 	let target = environment;
@@ -52,11 +49,12 @@ module.exports = function(environment) {
 		throw `${target} is not 'firefox' or 'chrome'`
 	}
 
+	let ext;
 	if (target === 'firefox') {
-		var ext = 'xpi'
+		ext = 'xpi'
 	}
 	else if (target === 'chrome') {
-		var ext = 'crx'
+		ext = 'crx'
 	}
 
 	let build_name = `${name}-${version}-${target}`;
@@ -95,17 +93,13 @@ module.exports = function(environment) {
 			{
 				from: './src/popup/popup.html',
 				to: `${build_dir}/popup`,
-				toType: 'dir'			
+				toType: 'dir'
 			},
 			{
 				from: "./assets/stoic-48.png",
 				to: `${build_dir}/assets`,
 				toType: 'dir'
 			}]),
-
-			new CleanWebpackPlugin([build_dir], {
-				root: absolute("build")
-			}),
 
 			new ZipPlugin({
 				path: "../",

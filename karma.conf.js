@@ -1,6 +1,6 @@
 // Karma configuration for unit testing with real browsers
 
-var RewirePlugin = require("rewire-webpack");
+const RewireWebpackPlugin = require('rewire-webpack-plugin');
 
 module.exports = function(config) {
   config.set({
@@ -18,7 +18,7 @@ module.exports = function(config) {
 
     webpack: {
         mode: "development",
-        plugins: [new RewirePlugin()]
+        plugins: [new RewireWebpackPlugin()]
     },
 
     reporters: ['mocha'],
