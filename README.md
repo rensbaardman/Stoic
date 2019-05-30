@@ -2,18 +2,28 @@
 Browser extension that hides distracting and unneccessary elements to help you regain focus
 
 ### Commands
-`npm run test:unit`
+
+	npm run test:unit
+
 unit testing with the Node.js-engine (fast, but doesn't catch quirks in browser implementations)
 
-`npm run test:unit-browser`
+	npm run test:unit-browser
+
 unit testing with Firefox and Chrome
 
+---
+
 note the different terminology in Release channels
-Firefox: Nightly -> Developer Edition (Aurora) -> Beta -> Stable
-Chrome: Canary -> Dev -> Beta -> Stable
+
+**Firefox:** Nightly -> Developer Edition (Aurora) -> Beta -> Stable
+
+**Chrome:** Canary -> Dev -> Beta -> Stable
+
 we are interested in the upcoming (next 1 or 2 months) release, but as it would be for users, not for developers. That means Beta. E.g. Developer Edition in Firefox allows unsigned extensions. We want to make sure that our extension is properly signed! Thus we would want to catch this bug.
+
     ---> actually might not be such a problem, see
     "Unsigned extensions can be installed in Developer Edition, Nightly, and ESR versions of Firefox, after toggling the xpinstall.signatures.required preference in about:config."
+
 The Nightly/Canary editions are too premature too test for. They could contain browser bugs, and would generate a lot of downloading/updating.
 
 
