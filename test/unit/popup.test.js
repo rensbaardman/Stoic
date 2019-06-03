@@ -1,6 +1,4 @@
-const popup_src_path = '../../src/popup/popup.js'
-// const popup = require(popup_src_path);
-const popup = require('../../src/popup/popup.js') // make webpack happy
+const popup = require('../../src/popup/popup.js');
 const expect = require('chai').expect;
 const assert = require('chai').assert;
 const sinon = require('sinon');
@@ -32,7 +30,7 @@ describe('popup', function() {
 				}
 			}
 
-			popup_rewired = rewire(popup_src_path);
+			popup_rewired = rewire('../../src/popup/popup.js');
 			popup_rewired.__set__('browser', browser_stub);
 			
 		})
