@@ -1,8 +1,12 @@
 const should = require('chai').should(),
       assert = require('chai').assert,
       expect = require('chai').expect;
-const {Builder, By, Key, until} = require('selenium-webdriver');
-const {firefox_options, chrome_options, get_popup_url, open_in_new_tab, safe_close_window} = require('../selenium_utils.js')
+
+const {	By,
+		Key,
+		until} = require('selenium-webdriver');
+
+const { setup_driver } = require('../selenium_utils.js')
 
 
 describe('popup', function() {
@@ -13,24 +17,12 @@ describe('popup', function() {
 	var popup_url;
 
 	before(async function() {
-		driver = await new Builder()
-			.setFirefoxOptions(firefox_options)
-			.setChromeOptions(chrome_options)
-			.build();
-		popup_url = await get_popup_url(driver);
-
+		driver = await setup_driver();
+		popup_url = await driver.get_popup_url();
 	})
 
 	afterEach(async function() {
-
-		// close all windows in a safe manner:
-		// leave one 'about:blank'-tab open, so the
-		// session stays alive.
-		const handles = await driver.getAllWindowHandles();
-		for (let handle of handles) {
-			await safe_close_window(driver, handle)
-		}
-
+		await driver.safe_close_all_windows()
 		// TODO: also do things like:
 		// reset local storage
 	})
@@ -38,7 +30,6 @@ describe('popup', function() {
 	after(async function() {
 		await driver.quit()
 	})
-
 
 	it("should have 'Stoic' in the title", async function() {
 
@@ -54,7 +45,7 @@ describe('popup', function() {
 	it("should show the url of the active page", async function() {
 		
 		await driver.get('http://google.com');
-		await open_in_new_tab(driver, popup_url);
+		await driver.open_in_new_tab(popup_url);
 
 		try {
 			var element = await driver.findElement(By.css('#url'));

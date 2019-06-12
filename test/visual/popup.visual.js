@@ -1,20 +1,13 @@
-const {firefox_options, chrome_options, open_popup_page, get_browser_name} = require('../selenium_utils.js');
-const {Builder, By, Key, until} = require('selenium-webdriver');
+const {setup_driver} = require('../selenium_utils.js');
+const {By, Key, until} = require('selenium-webdriver');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
 const package = require('../../package.json');
 
-async function setup_driver() {
-	let driver = await new Builder()
-		.setFirefoxOptions(firefox_options)
-		.setChromeOptions(chrome_options)
-		.build();
-	return driver;
-}
 
 async function take_screenshot_popup(driver) {
-	await open_popup_page(driver);
-	let browser_name = await get_browser_name(driver);
+	await driver.open_popup_page();
+	let browser_name = await driver.get_browser_name();
 	let screenshot = await driver.takeScreenshot()
 	return [screenshot, browser_name, 'popup init']
 }
