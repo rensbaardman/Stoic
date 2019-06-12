@@ -14,7 +14,7 @@ function file_to_buffer(path) {
 	return Buffer.from(file).toString('base64');
 }
 
-firefox_options = new firefox.Options();
+let firefox_options = new firefox.Options();
 // TODO find a way to load unsigned extensions as temporary extensions in default Firefox
 // see https://support.mozilla.org/en-US/kb/add-on-signing-in-firefox
 // cf what web-ext does
@@ -25,13 +25,23 @@ firefox_options
 	.setBinary(firefox.Channel.AURORA)
 	.setPreference('xpinstall.signatures.required', false)
 
-chrome_options = new chrome.Options();
+let chrome_options = new chrome.Options();
 chrome_options
-	.addExtensions(file_to_buffer(`build/${name}-${version}-chrome.crx`))
 	// removes the 'Chrome is being controlled by automated test software'-warning
 	// via https://sqa.stackexchange.com/a/26120
 	.addArguments("disable-infobars");
 
+// Since chrome_options takes the _file_ of the
+// extension itself, we have to consider the case
+// where we are building and then testing Firefox
+// first, and the build for Chrome is not yet available.
+// This workaround considers that case, but unfortunately
+// we now exports different chrome_options depending
+// on the env variable SELENIUM_BROWSER...
+const target = process.env.SELENIUM_BROWSER;
+if (target === 'chrome') {
+	chrome_options.addExtensions(file_to_buffer(`build/${name}-${version}-chrome.crx`))
+}
 
 function get_shadow_root(driver, element) {
 	return driver.executeScript("return arguments[0].shadowRoot", element);
