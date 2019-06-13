@@ -8,7 +8,6 @@ const package = require('../package.json');
 const name = package.name
 const version = package.version
 
-
 function file_to_buffer(path) {
 	let file = fs.readFileSync(path);
 	return Buffer.from(file).toString('base64');
@@ -38,6 +37,9 @@ chrome_options
 // This workaround considers that case, but unfortunately
 // we now exports different chrome_options depending
 // on the env variable SELENIUM_BROWSER...
+// TODO: why is it not possible to take the file name of the extension,
+// as we do with Firefox and is possible according to the docs?
+// https://seleniumhq.github.io/selenium/docs/api/javascript/module/selenium-webdriver/chrome_exports_Options.html
 const target = process.env.SELENIUM_BROWSER;
 if (target === 'chrome') {
 	chrome_options.addExtensions(file_to_buffer(`build/${name}-${version}-chrome.crx`))
