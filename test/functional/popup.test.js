@@ -1,12 +1,8 @@
 const should = require('chai').should(),
       assert = require('chai').assert,
       expect = require('chai').expect;
-
-const {	By,
-		Key,
-		until} = require('selenium-webdriver');
-
-const { setup_driver } = require('../selenium_utils.js')
+const {By, Key, until} = require('selenium-webdriver');
+const {setup_driver} = require('../selenium_utils.js')
 
 
 describe('popup', function() {
@@ -44,8 +40,8 @@ describe('popup', function() {
 
 	it("should show the url of the active page", async function() {
 		
-		await driver.get('http://google.com');
-		await driver.open_in_new_tab(popup_url);
+		await driver.open_popup();
+		await driver.mock_url('fake_url');
 
 		try {
 			var element = await driver.findElement(By.css('#url'));
@@ -55,7 +51,7 @@ describe('popup', function() {
 		}
 
 		let content = await element.getText();
-		expect(content).to.include('google.com')
+		expect(content).to.equal('fake_url')
 
 	})
 

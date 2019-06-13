@@ -106,14 +106,32 @@ module.exports = function(environment) {
 				filename: build_name,
 				extension: ext
 			})
-		]
+		],
+
+		stats: {
+			env: true
+		}
+
 	};
 
-	if (target === 'firefox') {
-		var ignore_polyfill = new webpack.IgnorePlugin({
-			resourceRegExp: /^webextension-polyfill$/
-		});
-		config.plugins.push(ignore_polyfill);
+	// Adds the webextensions-polyfill
+	// for chrome only. (and only in
+	// the popup, since elsewhere 'browser' is undefined)
+	if (target === 'chrome') {
+		config.module =  {
+			rules: [{
+				test: /popup\.js$/,
+				loader: path.resolve('tools/polyfill_loader.js')
+			}]
+		}
+	}
+
+	// if we are doing functional tests,
+	// we need to be able to access the bundle,
+	// so we can then active tab listeners if
+	// we mock a changed url
+	if (process.env.WEBPACK_CONTEXT === 'test') {
+		config.output.library = 'bundle'
 	}
 
 	return config

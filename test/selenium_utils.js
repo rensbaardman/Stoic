@@ -1,12 +1,11 @@
 const fs = require('fs');
+const mkdirp = require('mkdirp');
 
 const {Builder, By} = require('selenium-webdriver');
 const firefox = require('selenium-webdriver/firefox');
 const chrome = require('selenium-webdriver/chrome');
 
 const package = require('../package.json');
-const name = package.name
-const version = package.version
 
 function file_to_buffer(path) {
 	let file = fs.readFileSync(path);
@@ -20,7 +19,7 @@ let firefox_options = new firefox.Options();
 // cf this issue (undocumented commands?)
 // https://github.com/mozilla/geckodriver/issues/473
 firefox_options
-	.addExtensions(`build/${name}-${version}-firefox.xpi`)
+	.addExtensions(`build/${package.name}-${package.version}-firefox.xpi`)
 	.setBinary(firefox.Channel.AURORA)
 	.setPreference('xpinstall.signatures.required', false)
 
@@ -42,14 +41,20 @@ chrome_options
 // https://seleniumhq.github.io/selenium/docs/api/javascript/module/selenium-webdriver/chrome_exports_Options.html
 const target = process.env.SELENIUM_BROWSER;
 if (target === 'chrome') {
-	chrome_options.addExtensions(file_to_buffer(`build/${name}-${version}-chrome.crx`))
+	chrome_options.addExtensions(file_to_buffer(`build/${package.name}-${package.version}-chrome.crx`))
 }
 
 // we could also get this from the environment variable
 // SELENIUM_BROWSER
 async function get_browser_name() {
+
+	if (this.browser_name !== undefined) {
+		return this.browser_name
+	}
+
 	let capabilities = await this.getCapabilities()
-	return capabilities.get('browserName')
+	this.browser_name = capabilities.get('browserName');
+	return this.browser_name
 }
 
 async function get_extension_id() {
@@ -62,6 +67,11 @@ async function get_extension_id() {
 	// we shouldn't assume this. Also, Firefox's internal ID might be
 	// different.
 
+	// after we did this once, we save the extension_id
+	if (this.extension_id !== undefined) {
+		return this.extension_id
+	}
+
 	let browser_name = await this.get_browser_name();
 
 	if (browser_name === 'firefox') {
@@ -71,7 +81,9 @@ async function get_extension_id() {
 		let element = await this.findElement(By.css('li[data-addon-id="Stoic@rensbaardman.nl"] dd.internal-uuid span:first-child'))
 		let id = await element.getAttribute('innerHTML');
 		await this.safe_close_current_window();
-		return id;
+		// save it so we don't have to go through this all later on
+		this.extension_id = id;
+		return this.extension_id
 	} else if (browser_name === 'chrome') {
 	
 		await this.open_in_new_tab('chrome://extensions/');
@@ -90,10 +102,12 @@ async function get_extension_id() {
 			let ext_name = await name_element.getText()
 
 			// 'name' is extracted from package.json
-			if (ext_name === name) {
+			if (ext_name === package.name) {
 				let id = await extension.getAttribute('id');
 				await this.safe_close_current_window();
-				return id;
+				// save it so we don't have to go through this all later on
+				this.extension_id = id;
+				return this.extension_id;
 			}
 		}
 	} else {
@@ -119,10 +133,11 @@ async function get_extension_base_url(id) {
 }
 
 async function get_popup_url() {
+	if (this.popup_url !== undefined) { return this.popup_url; }
 	let id = await this.get_extension_id()
 	let base_url = await this.get_extension_base_url(id)
-	let url = `${base_url}/popup/popup.html`
-	return url	
+	this.popup_url = `${base_url}/popup/popup.html`
+	return this.popup_url
 }
 
 // TODO: this could be done cleaner with sending 'COMMAND/CONTROL + t', but apparently doesn't work. See https://stackoverflow.com/a/41974917/7770056
@@ -133,6 +148,10 @@ async function open_in_new_tab(url) {
 	const new_window_handle = handles[handles.length - 1];
 	await this.switchTo().window(new_window_handle);
 	return this.get(url);
+}
+
+function open_popup() {
+	return this.get_popup_url().then((popup_url) => this.get(popup_url) )
 }
 
 async function safe_close_window(handle) {
@@ -185,6 +204,69 @@ async function safe_close_all_windows() {
 	}
 }
 
+async function mock_url(url) {
+
+	let current_url = await this.getCurrentUrl();
+	let popup_url = await this.get_popup_url();
+
+	// only apply in the popup, since else
+	// browser is undefined
+	if (current_url === popup_url) {
+		// clone old browser.tabs.query to our namespace,
+		// mock the relevant part of browser.tabs.query,
+		// then activate all handlers as if the urls was
+		// really changed.
+		script = `
+			var _selenium = { browser: { tabs: { query: browser.tabs.query.bind({}) }}};
+			browser.tabs.query = function(queryInfo) {
+				if (queryInfo = {currentWindow: true, active: true}) {
+					return new Promise( (resolve, reject) => {resolve([{url: '${url}'}])});
+				}
+				else {
+					return _selenium.browser.tabs.query(queryInfo)
+				}
+			};
+			for (let listener of bundle.tabOnUpdatedListeners) {
+				if (browser.tabs.onUpdated.hasListener(listener)) {
+					listener()
+				}
+			}`
+		return this.executeScript(script)
+	}
+	else {
+		throw new Error(`url can only be mocked within the popup, current_url is: ${current_url}`)
+	}
+
+}
+
+async function saveScreenshot(description) {
+
+	// TODO: consider from where the path should resolve?
+	const filedir = `test/visual/screenshots/${package.name}-${package.version}`;
+	// somehow needs this extra '/' at the end - docs say otherwise
+	await mkdirp(`${filedir}/`, (err) => {
+		if (err) throw err;
+	});
+
+
+	const browser_name = await this.get_browser_name();
+	if (description === undefined) {
+		const url = await this.getCurrentUrl();
+		description = url.split('/')[1]
+	}
+
+	const safe_description = description.replace(' ', '_').replace(':', '-').replace('/', '-')
+
+	const filepath = `${filedir}/${package.version}-${browser_name}-${safe_description}.png`;
+
+	let screenshot = await this.takeScreenshot()
+	// driver.takeScreenshot() returns a base-64 encoded PNG
+	fs.writeFile(filepath, screenshot, {encoding: 'base64'}, (err) => {
+		if (err) throw err;
+		return;
+	});
+}
+
 
 class ExtendedBuilder extends Builder {
 
@@ -196,9 +278,12 @@ class ExtendedBuilder extends Builder {
 		driver.get_extension_base_url = get_extension_base_url;
 		driver.get_popup_url = get_popup_url;
 		driver.open_in_new_tab = open_in_new_tab;
+		driver.open_popup = open_popup;
 		driver.safe_close_window = safe_close_window;
 		driver.safe_close_current_window = safe_close_current_window;
 		driver.safe_close_all_windows = safe_close_all_windows;
+		driver.mock_url = mock_url;
+		driver.saveScreenshot = saveScreenshot;
 		return driver;
 	}
 
