@@ -1,9 +1,7 @@
-const popup = require('../../src/popup/popup.js');
 const expect = require('chai').expect;
 const assert = require('chai').assert;
 const sinon = require('sinon');
 const rewire = require('rewire');
-
 
 describe('popup', function() {
 

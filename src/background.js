@@ -1,5 +1,3 @@
-var utils = require('./utils.js');
-
 // when not running this within an extension
 // in Firefox or Chrome, (such as when unit testing,
 // either in Node or in the browser but not within
@@ -23,12 +21,3 @@ if (typeof browser === undefined) {
 // TODO: somehow atomize this and place in utils (but should also work outside of that)
 // TODO: consider just checking for 'typeof chrome !== undefined', but note that the
 // chrome-namespace is also defined outside of extensions (just in a smaller version)
-
-
-function blabla(integer) {
-	return 2 * integer
-}
-
-module.exports = {
-	blabla: blabla
-}
