@@ -9,7 +9,7 @@ describe('popup', function() {
 
 	describe('#active_url', function() {
 
-		let popup_rewired, example_url;
+		let popup, example_url;
 
 		beforeEach(function() {
 
@@ -21,8 +21,7 @@ describe('popup', function() {
 			// https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/Tab
 			// We assume that the permission 'tabs' has been requested!
 			let tab_array = [{url: example_url}]
-			let query_result = new Promise((resolve, reject) =>
-				{resolve(tab_array)})
+			let query_result = new Promise( (resolve, reject) => {resolve(tab_array)} )
 			query_stub.withArgs({currentWindow: true, active: true}).returns(query_result);
 			let browser_stub = {
 				tabs: {
@@ -30,9 +29,10 @@ describe('popup', function() {
 				}
 			}
 
-			popup_rewired = rewire('../../src/popup/popup.js');
-			popup_rewired.__set__('browser', browser_stub);
-			
+			popup = rewire('../../src/popup/popup.js');
+			popup.__set__('browser', browser_stub);
+			popup.active_url = popup.__get__('active_url');
+
 		})
 
 		it('returns a Promise', function() {
