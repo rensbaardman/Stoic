@@ -10,11 +10,9 @@ describe('popup', function() {
 	this.timeout(20000);
 
 	var driver;
-	var popup_url;
 
 	before(async function() {
 		driver = await setup_driver();
-		popup_url = await driver.get_popup_url();
 	})
 
 	afterEach(async function() {
@@ -29,7 +27,7 @@ describe('popup', function() {
 
 	it("should have 'Stoic' in the title", async function() {
 
-		await driver.get(popup_url);
+		await driver.open_popup();
 
 		let header = await driver.findElement(By.css('h1'));
 		let text = await header.getText();
