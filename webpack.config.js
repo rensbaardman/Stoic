@@ -4,7 +4,12 @@ const path = require('path');
 
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ZipPlugin = require('zip-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+// following should be temporary - fixed in Webpack 5 (?):
+// bundling of css (and css extract plugin) emits extra empty .js file
+var SuppressChunksPlugin = require('suppress-chunks-webpack-plugin').default;
 
 const package = require('./package.json');
 const version = package.version; // TODO: not necessarily path-friendly
@@ -69,7 +74,8 @@ module.exports = function(environment) {
 	
 		entry: {
 			"background": "./src/background.js",
-			"popup/popup": "./src/popup/popup.js"
+			"popup/popup": "./src/popup/popup.js",
+			"popup/styles/popup": "./src/popup/styles/popup.sass"
 		},
 
 		output: {
@@ -82,6 +88,9 @@ module.exports = function(environment) {
 		},
 
 		plugins: [
+
+			new CleanWebpackPlugin(),
+
 			new CopyWebpackPlugin([
 			{
 				from: "./src/manifest.json",
@@ -96,7 +105,7 @@ module.exports = function(environment) {
 				toType: 'dir'
 			},
 			{
-				from: "./assets/stoic-48.png",
+				from: "./assets",
 				to: `${build_dir}/assets`,
 				toType: 'dir'
 			}]),
@@ -105,8 +114,26 @@ module.exports = function(environment) {
 				path: "../",
 				filename: build_name,
 				extension: ext
-			})
+			}),
+
+			new MiniCssExtractPlugin({
+				filename: '[name].css'
+			}),
+
+			// suppress extra .js file created for style.sass/css
+			new SuppressChunksPlugin([{name: 'popup/styles/popup', match: /\.js$/ }])
 		],
+
+		module: {
+			rules: [{
+				test: /\.sass$/,
+				use: [
+					MiniCssExtractPlugin.loader,
+					'css-loader',
+					'sass-loader'
+				]
+			}]
+		},
 
 		stats: {
 			env: true
@@ -118,12 +145,10 @@ module.exports = function(environment) {
 	// for chrome only. (and only in
 	// the popup, since elsewhere 'browser' is undefined)
 	if (target === 'chrome') {
-		config.module =  {
-			rules: [{
-				test: /popup\.js$/,
-				loader: path.resolve('tools/polyfill_loader.js')
-			}]
-		}
+		config.module.rules.push({
+			test: /popup\.js$/,
+			loader: path.resolve('tools/polyfill_loader.js')
+		})
 	}
 
 	// if we are doing functional tests,

@@ -1,0 +1,69 @@
+.toggle input[type=checkbox]
+	display: none
+
+.toggle label
+	display: inline-block
+	position: relative
+	width: 34px
+	height: 34px
+	border-radius: 17px
+
+
+.toggle label:hover
+	cursor: pointer
+
+.toggle label:before
+	content: ''
+	display: inline-block
+
+	position: absolute
+	top: 2px
+	left: 2px
+
+	width: 30px
+	height: 30px
+	border-radius: 15px
+
+	background: #5c99ce
+
+.toggle label:after
+	content: ''
+	display: inline-block
+
+	position: absolute
+	top: 4px
+	left: 4px
+
+	width: 26px
+	height: 26px
+	border-radius: 13px
+
+	background: white
+	transition: .1s
+
+.toggle input[type=checkbox]:checked + label::after
+	opacity: 0
+	transition: .1s
+
+.toggle input[type=checkbox]:checked + label::before
+	background: #5c99ce
+	transition: .1s
+
+
+.toggle-small label:before
+
+	top: 5px
+	left: 5px
+
+	width: 24px
+	height: 24px
+	border-radius: 12px
+
+.toggle-small label:after
+	top: 7px
+	left: 7px
+
+	width: 20px
+	height: 20px
+	border-radius: 10px
+
