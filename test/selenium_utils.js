@@ -2,7 +2,7 @@ const fs = require('fs');
 const mkdirp = require('mkdirp');
 const gm = require('gm').subClass({imageMagick: true});
 
-const {Builder, By} = require('selenium-webdriver');
+const {Builder, By, until} = require('selenium-webdriver');
 const firefox = require('selenium-webdriver/firefox');
 const chrome = require('selenium-webdriver/chrome');
 
@@ -54,8 +54,19 @@ async function get_browser_name() {
 	}
 
 	let capabilities = await this.getCapabilities()
-	this.browser_name = capabilities.get('browserName');
+	this.browser_name = capabilities.getBrowserName();
 	return this.browser_name
+}
+
+async function get_browser_version() {
+
+	if (this.browser_version !== undefined) {
+		return this.browser_version
+	}
+
+	let capabilities = await this.getCapabilities()
+	this.browser_version = capabilities.getBrowserVersion();
+	return this.browser_version
 }
 
 async function get_extension_id() {
@@ -74,17 +85,37 @@ async function get_extension_id() {
 	}
 
 	let browser_name = await this.get_browser_name();
+	let browser_version = await this.get_browser_version()
 
 	if (browser_name === 'firefox') {
-		await this.open_in_new_tab('about:debugging#addons');
+
 		// TODO: the manifest ID Stoic@rensbaardman.nl gets injected in build_manifest() in webpack.config.js;
 		// try to get that one out (or at least move to manifest.json or something like APP_INFO)
-		let element = await this.findElement(By.css('li[data-addon-id="Stoic@rensbaardman.nl"] dd.internal-uuid span:first-child'))
+		let element;
+
+		// new addon page url scheme starting from 68.0
+		if (browser_version >= '68.0') {
+			await this.open_in_new_tab('about:debugging#/runtime/this-firefox')
+			// this is XPATH for:
+			// get dd with text ...
+			// then twice up a layer ('/..' is parent)
+			// then the second div
+			// and then dd
+			element = await this.wait(until.elementLocated(By.xpath('//dd[text()="Stoic@rensbaardman.nl"]/../..//div[2]/dd')), 2000);
+			// element = await this.findElement(By.xpath('//dd[text()="Stoic@rensbaardman.nl"]/../..//div[2]/dd'))
+
+		}
+		else {
+			await this.open_in_new_tab('about:debugging#addons');
+			element = await this.findElement(By.css('li[data-addon-id="Stoic@rensbaardman.nl"] dd.internal-uuid span:first-child'))
+		}
+
 		let id = await element.getAttribute('innerHTML');
 		await this.safe_close_current_window();
 		// save it so we don't have to go through this all later on
 		this.extension_id = id;
 		return this.extension_id
+
 	} else if (browser_name === 'chrome') {
 	
 		await this.open_in_new_tab('chrome://extensions/');
@@ -279,6 +310,7 @@ class ExtendedBuilder extends Builder {
 	async build() {
 		let driver = await super.build();
 		driver.get_browser_name = get_browser_name;
+		driver.get_browser_version = get_browser_version;
 		driver.get_extension_id = get_extension_id;
 		driver.get_shadow_root = get_shadow_root;
 		driver.get_extension_base_url = get_extension_base_url;
