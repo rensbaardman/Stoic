@@ -10,6 +10,9 @@ async function main() {
 	await driver.mock_url('http://fake-url.com')
 	await driver.saveScreenshot('popup fake-url')
 
+	await driver.mock_url('http://my-extremely-long-incredibly-loud-very-annoying-unbelievibly-close-fake-url.com')
+	await driver.saveScreenshot('popup long fake-url')
+
 	await driver.quit()
 }
 

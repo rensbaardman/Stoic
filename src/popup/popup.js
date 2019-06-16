@@ -1,10 +1,6 @@
-const {getActiveUrl, updatePopupUrl} = require('./js/popup_utils.js')
+const {getActiveUrl, updatePopupUrl, extractHost} = require('./js/popup_utils.js')
 const {generateHeader, generateCategories, generateFooter} = require('./js/components.js')
 
-// updatePopupUrl()
-// browser.tabs.onUpdated.addListener(getActiveUrl);
-
-console.log('begin load')
 dummy_categories = [
 
 	{
@@ -125,9 +121,8 @@ function addStatusOnClickHandler() {
 }
 
 async function populatePopup() {
-	console.log('popuplate popup')
 	const url = await getActiveUrl();
-	const header = generateHeader(url, true);
+	const header = generateHeader(extractHost(url), true);
 	const categories = generateCategories(dummy_categories);
 	const footer = generateFooter();
 	document.body.innerHTML = `${header}${categories}${footer}`;
@@ -140,17 +135,9 @@ async function populatePopup() {
 populatePopup()
 browser.tabs.onUpdated.addListener(populatePopup);
 
-
-
-console.log('fired!')
-
-
-
 // necessary for functional tests,
 // so we can mock url in Selenium and still
 // fire tab listeners
 module.exports = {
 	tabOnUpdatedListeners: [populatePopup]
 }
-
-console.log('end load')

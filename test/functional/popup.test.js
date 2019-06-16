@@ -36,20 +36,20 @@ describe('popup', function() {
 
 	});
 
-	it("should show the url of the active page", async function() {
+	it("should show the host of the active page", async function() {
 		
 		await driver.open_popup();
-		await driver.mock_url('fake_url');
+		await driver.mock_url('https://www.my.fake_url.co.uk/folder/directory/index.php');
 
 		try {
 			var element = await driver.findElement(By.css('#url'));
 		}
 		catch (error) {
-			assert.fail(`Should not have raised ${error}`);
+			assert.fail(`url-element not found, ${error}`);
 		}
 
 		let content = await element.getText();
-		expect(content).to.equal('fake_url')
+		expect(content).to.equal('my.fake_url.co.uk');
 
 	})
 
