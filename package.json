@@ -28,7 +28,7 @@
 		"rewire": "github:rensbaardman/rewire",
 		"rewire-webpack-plugin": "^1.0.0",
 		"sass-loader": "^7.1.0",
-		"selenium-webdriver": "webexts/selenium#nodejs",
+		"selenium-webdriver": "^4.0.0-alpha.3",
 		"sinon": "^7.3.2",
 		"sinon-chrome": "^3.0.1",
 		"suppress-chunks-webpack-plugin": "^1.0.5",
