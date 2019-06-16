@@ -108,6 +108,11 @@ module.exports = function(environment) {
 				from: "./assets",
 				to: `${build_dir}/assets`,
 				toType: 'dir'
+			},
+			{
+				from: "./rules",
+				to: `${build_dir}/rules`,
+				toType: 'dir'
 			}]),
 
 			new ZipPlugin({
@@ -155,7 +160,8 @@ module.exports = function(environment) {
 	// we need to be able to access the bundle,
 	// so we can then active tab listeners if
 	// we mock a changed url
-	if (process.env.WEBPACK_CONTEXT === 'test') {
+	// (also used and handy in debugging)
+	if (process.env.WEBPACK_BUNDLE === 'true') {
 		config.output.library = 'bundle'
 	}
 
