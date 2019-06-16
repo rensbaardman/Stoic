@@ -5,10 +5,9 @@ async function main() {
 	let driver = await setup_driver();
 
 	await driver.open_popup();
-	await driver.saveScreenshot('popup init')
 
-	await driver.mock_url('http://fake-url.com')
-	await driver.saveScreenshot('popup fake-url')
+	await driver.mock_url('http://example.com')
+	await driver.saveScreenshot('popup example.com')
 
 	await driver.mock_url('http://my-extremely-long-incredibly-loud-very-annoying-unbelievibly-close-fake-url.com')
 	await driver.saveScreenshot('popup long fake-url')
