@@ -23,6 +23,12 @@ module.exports = function(config) {
 			plugins: [new RewireWebpackPlugin()]
 		},
 
+		// else errors will be like
+		// expected [ Array(14) ] to deeply equal [ Array(14) ]
+		mochaReporter: {
+			showDiff: true
+		},
+
 		colors: true,
 
 		// level of logging
