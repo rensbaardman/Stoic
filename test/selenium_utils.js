@@ -1,5 +1,6 @@
 const fs = require('fs');
 const mkdirp = require('mkdirp');
+const gm = require('gm').subClass({imageMagick: true});
 
 const {Builder, By} = require('selenium-webdriver');
 const firefox = require('selenium-webdriver/firefox');
@@ -248,23 +249,28 @@ async function saveScreenshot(description) {
 		if (err) throw err;
 	});
 
-
 	const browser_name = await this.get_browser_name();
 	if (description === undefined) {
 		const url = await this.getCurrentUrl();
 		description = url.split('/')[1]
 	}
-
 	const safe_description = description.replace(' ', '_').replace(':', '-').replace('/', '-')
-
 	const filepath = `${filedir}/${package.version}-${browser_name}-${safe_description}.png`;
 
+	// returns a base-64 encoded PNG
 	let screenshot = await this.takeScreenshot()
-	// driver.takeScreenshot() returns a base-64 encoded PNG
-	fs.writeFile(filepath, screenshot, {encoding: 'base64'}, (err) => {
-		if (err) throw err;
-		return;
-	});
+
+	// get bodysize to crop perfectly
+	const body = await this.findElement(By.css('body'))
+	const size = await body.getRect();
+
+	gm(Buffer.from(screenshot, 'base64'))
+		.crop(size.width, size.height, 0, 0)
+		.write(filepath, (err) => {
+			if (err) throw err;
+			return;
+		});
+
 }
 
 
