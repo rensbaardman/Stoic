@@ -3,9 +3,9 @@ const assert = require('chai').assert;
 const sinon = require('sinon');
 const rewire = require('rewire');
 
-describe('popup_utils', function() {
+describe('url_utils', function() {
 
-	let popup_utils;
+	let url_utils;
 	let example_url = 'https://www.example.com/path/to/page?name=ferret&color=purple';
 
 	beforeEach(function() {
@@ -15,29 +15,21 @@ describe('popup_utils', function() {
 		query_stub.withArgs({currentWindow: true, active: true}).returns(query_result);
 		let browser_stub = { tabs: { query: query_stub } }
 
-		popup_utils = rewire('../../src/popup/js/popup_utils.js');
-		popup_utils.__set__('browser', browser_stub);
+		url_utils = rewire('../../src/utils/url_utils.js');
+		url_utils.__set__('browser', browser_stub);
 
 	})
 
 	describe('getActiveUrl', function() {
 
 		it('returns a Promise', function() {
-			let result = popup_utils.getActiveUrl();
+			let result = url_utils.getActiveUrl();
 			expect(result).to.be.an.instanceof(Promise);
 		})
 
 		it('returns the url of the active window', async function() {
-			let result = await popup_utils.getActiveUrl();
+			let result = await url_utils.getActiveUrl();
 			expect(result).to.equal(example_url)
-		})
-
-	})
-
-	describe('updatePopupUrl', function() {
-
-		it.skip('finish test', () => {
-			assert.fail('finish test')
 		})
 
 	})
@@ -58,8 +50,11 @@ describe('popup_utils', function() {
 				'chrome://settings/password',
 				'http://localhost:8000',
 				'http://192.168.0.0:81', // we use :81, because else default ports (e.g. :80) are turned into empty url.host
-				'http://user:pass@host.com:8080/p/a/t/h?query=string#hash'
+				'http://user:pass@host.com:8080/p/a/t/h?query=string#hash',
+				'moz-extension://0ef765d5-7fd6-3c44-8d06-91a08c25250e/popup/popup.html'
 			];
+			// TODO: consider more protocols / exceptions?
+			// about acct crid data file ftp geo gopher http https info ldap mailto nfs nntp sip / sips tag tel telnet urn view-source ws / wss xmpp
 			const expected_hosts = [
 				'en.wikipedia.org',
 				'en.wikipedia.org',
@@ -73,9 +68,10 @@ describe('popup_utils', function() {
 				'settings',
 				'localhost:8000',
 				'192.168.0.0:81',
-				'host.com:8080'
+				'host.com:8080',
+				'0ef765d5-7fd6-3c44-8d06-91a08c25250e'
 			]
-			const hosts = test_urls.map(popup_utils.extractHost)
+			const hosts = test_urls.map(url_utils.extractHost)
 			assert.deepEqual(hosts, expected_hosts)
 		})
 

@@ -7,12 +7,12 @@ function extractHost(url) {
 	if (url.startsWith('about:')) {
 		return url
 	}
-	else if (url.startsWith('chrome://')) {
+	else if (url.startsWith('chrome://') || url.startsWith('moz-extension://') || url.startsWith('chrome-extension://')) {
 		// e.g. chrome://settings/passwords
 		// becomes: [ 'chrome:', '', 'settings', 'passwords' ]
 		// Interestingly, Node just works fine with URL(url).host
-		// but both Chrome and Firefox say 'chrome://settings' is NOT
-		// a valid URL!
+		// but both Chrome and Firefox say 'chrome://settings' (and the other ones)
+		// is NOT a valid URL!
 		return url.split('/')[2]
 	}
 	else {
@@ -26,15 +26,7 @@ function extractHost(url) {
 	}
 }
 
-function updatePopupUrl() {
-	getActiveUrl().then((url) => {
-		let url_el = document.getElementById('url');
-		url_el.innerText = url
-	})
-}
-
 module.exports = {
 	getActiveUrl: getActiveUrl,
-	updatePopupUrl: updatePopupUrl,
 	extractHost: extractHost
 }

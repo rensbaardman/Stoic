@@ -23,17 +23,7 @@ function generateCategories(categories) {
 }
 
 function generateCategory(category) {
-	// category should be an object with
-	// the following structure:
-	// {
-	// 	active: true / false,
-	// 	overriden: true / false,
-	//  opened: true / false,
-	// 	cat_id: <string>
-	// 	name: <string>,
-	// 	rules: array of rule objects
-	// }
-
+	// category should be a Category Object
 	return `<li class="category${category.active ? ' active' : ''}${category.overriden ? ' overriden' : ''}${category.opened ? ' opened' : ''}">
 
 	<div class="category-name">
@@ -54,14 +44,6 @@ function generateCategory(category) {
 }
 
 function generateRule(rule) {
-	// rule should be an object with
-	// the following structure:
-	// {
-	// 	rule.override: true / false,
-	// 	rule.desc: <string>,
-	// 	rule.id: <string>,
-	// 	rule.active: true / false
-	// }
 	return `<li class="rule${rule.override ? ' override' : ''}">
 	${rule.desc}
 	<div class="toggle toggle-small">

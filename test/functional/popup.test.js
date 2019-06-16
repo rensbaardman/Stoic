@@ -26,6 +26,7 @@ describe('popup', function() {
 	})
 
 	it("should have 'Stoic' in the title", async function() {
+		// kind of a smoke test
 
 		await driver.open_popup();
 
@@ -36,20 +37,28 @@ describe('popup', function() {
 
 	});
 
-	it("should show the host of the active page", async function() {
+	it("should show the host of the current page", async function() {
 		
 		await driver.open_popup();
 		await driver.mock_url('https://www.my.fake_url.co.uk/folder/directory/index.php');
 
-		try {
-			var element = await driver.findElement(By.css('#url'));
-		}
-		catch (error) {
-			assert.fail(`url-element not found, ${error}`);
-		}
+		let element = await driver.findElement(By.css('#url'));
 
 		let content = await element.getText();
 		expect(content).to.equal('my.fake_url.co.uk');
+
+	});
+
+	it("should show the categories of the current page", async () => {
+
+		await driver.open_popup();
+		await driver.mock_url('https://www.example.com/yes/no.html');
+
+		let category_titles = await driver.findElements(By.css('li.category h3'))
+		let category_texts = await Promise.all(category_titles.map((el) => el.getText()))
+
+		const expected_categories = ['NO RELATED', 'NO LOGO']
+		assert.deepEqual(category_texts.sort(), expected_categories.sort())
 
 	})
 

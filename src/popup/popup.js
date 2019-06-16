@@ -1,92 +1,6 @@
-const {getActiveUrl, updatePopupUrl, extractHost} = require('./js/popup_utils.js')
-const {generateHeader, generateCategories, generateFooter} = require('./js/components.js')
-
-dummy_categories = [
-
-	{
-		cat_id: 'no-logo',
-		name: 'NO LOGO',
-		active: true,
-		overriden: true,
-		opened: false,
-		rules: [
-			{
-				desc: 'Hide logo on the left',
-				id: 'no-logo-left',
-				active: true,
-				override: false
-			},
-			{
-				desc: 'Hide logo on the bottom',
-				id: 'no-logo-bottom',
-				active: false,
-				override: true
-			},
-			{
-				desc: 'Hide logo on the right',
-				id: 'no-logo-right',
-				active: true,
-				override: false
-			}
-		]
-	},
-
-	{
-		cat_id: 'no-comments',
-		name: 'NO COMMENTS',
-		active: false,
-		overriden: true,
-		opened: true,
-		rules: [
-			{
-				desc: 'Hide comment on the left',
-				id: 'no-comment-left',
-				active: false,
-				override: false
-			},
-			{
-				desc: 'Hide comment on the bottom',
-				id: 'no-comment-bottom',
-				active: true,
-				override: true
-			},
-			{
-				desc: 'Hide comment on the right',
-				id: 'no-comment-right',
-				active: false,
-				override: false
-			}
-		]
-	},
-
-	{
-		cat_id: 'no-social',
-		name: 'NO SOCIAL',
-		active: true,
-		overriden: false,
-		opened: false,
-		rules: [
-			{
-				desc: 'Hide logo on the left',
-				id: 'no-logo-left',
-				active: true,
-				override: false
-			},
-			{
-				desc: 'Hide logo on the bottom',
-				id: 'no-logo-bottom',
-				active: true,
-				override: false
-			},
-			{
-				desc: 'Hide logo on the right',
-				id: 'no-logo-right',
-				active: true,
-				override: false
-			}
-		]
-	}
-]
+const {getActiveUrl, extractHost} = require('../utils/url_utils.js')
+const {getRules, constructCategories} = require('../utils/rule_utils.js')
+const {generateHeader, generateCategories, generateFooter} = require('./components.js')
 
 function toggle(el, className) {
 	if (el.classList.contains(className)) {
@@ -122,10 +36,17 @@ function addStatusOnClickHandler() {
 
 async function populatePopup() {
 	const url = await getActiveUrl();
-	const header = generateHeader(extractHost(url), true);
-	const categories = generateCategories(dummy_categories);
+	const host = extractHost(url)
+
+	const rules = await getRules(host);
+	const categories = constructCategories(rules);
+
+	const header = generateHeader(host, true);
+	const main = generateCategories(categories);
 	const footer = generateFooter();
-	document.body.innerHTML = `${header}${categories}${footer}`;
+
+	document.body.innerHTML = `${header}${main}${footer}`;
+
 	addCategoryOnClickHandlers();
 	addStatusOnClickHandler();
 }

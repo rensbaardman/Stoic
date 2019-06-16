@@ -1,0 +1,16 @@
+{
+	"related": [
+		{
+			"desc": "hide 'More information...'",
+			"id": "hide-more-info",
+			"css": "a { display: none }"
+		}
+	],
+	"logo": [
+		{
+			"desc": "hide logotitle",
+			"id": "hide-logotitle",
+			"css":  "h1 { display: none }"
+		}
+	]
+}
