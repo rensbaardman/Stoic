@@ -281,7 +281,12 @@ async function mock_url(url) {
 					listener(${tabId}, ${JSON.stringify(changeInfo)}, ${JSON.stringify(tab)})
 				}
 			}`
-		return this.executeScript(script)
+		await this.executeScript(script)
+		// not pretty, but makes a whole lot of tests more stable.
+		// Apparently this.executeScript returns before the script
+		// has actually fully executed. Or at least before
+		// all consequences have been followed.
+		return this.sleep(500)
 	}
 	else {
 		throw new Error(`url can only be mocked within the popup, current_url is: ${current_url}`)
