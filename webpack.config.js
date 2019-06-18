@@ -155,6 +155,10 @@ module.exports = function(environment) {
 		config.module.rules.push({
 			test: /popup\.js$/,
 			loader: path.resolve('tools/polyfill_loader.js')
+		});
+		config.module.rules.push({
+			test: /background\.js$/,
+			loader: path.resolve('tools/polyfill_loader.js')
 		})
 	}
 

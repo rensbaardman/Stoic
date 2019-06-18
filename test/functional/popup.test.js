@@ -16,27 +16,25 @@ describe('popup', function() {
 	})
 
 	afterEach(async function() {
-		await driver.safe_close_all_windows()
-		// TODO: also do things like:
-		// reset local storage
+		await driver.reset_extension_storage();
+		await driver.safe_close_all_windows();
 	})
 
 	after(async function() {
 		await driver.quit()
 	})
 
-	describe.skip('initial appearance', () => {
+	describe('initial appearance', () => {
 
 		it("should have 'Stoic' in the title", async () => {
 			// kind of a smoke test
 
 			await driver.open_popup();
 
-			let header = await driver.findElement(By.css('h1'));
-			let text = await header.getText();
+			let title = await driver.findElement(By.css('h1'));
+			let title_text = await title.getText();
 
-			expect(text).to.equal('Stoic')
-
+			expect(title_text).to.equal('Stoic')
 		});
 
 		it("should show the host of the current page", async () => {
