@@ -34,8 +34,11 @@ function addStatusOnClickHandler() {
 	}
 }
 
-async function populatePopup() {
-	const url = await getActiveUrl();
+async function populatePopup(url) {
+
+	if (url === undefined) {
+		url = await getActiveUrl();
+	}
 	const host = extractHost(url)
 
 	const rules = await getRules(host);
@@ -52,14 +55,33 @@ async function populatePopup() {
 	addStatusOnClickHandler();
 }
 
+function tabOnUpdatedListener(tabId, changeInfo, tab) {
+	// this prevents the popup from being 're-populated'
+	// (refreshed) whenever new tab-info (e.g. favicon) is
+	// available.
+	//  TODO: test this behaviour? Either unit test or
+	// functional test? (last on is hard, first one is
+	// really tied to implementation...)
+	// TODO: also consider behaviour with multiple windows.
+	// Should probably only populate if in this current window
+	// (else url update in other window - which has its own active tab (?)
+	// - will change the url in this windows popup)
+	const url = changeInfo.url
+	if (url !== undefined & tab.active) {
+		populatePopup(url)
+	}
+}
+browser.tabs.onUpdated.addListener(tabOnUpdatedListener);
 
+function main() {
+	populatePopup()
+}
 
-populatePopup()
-browser.tabs.onUpdated.addListener(populatePopup);
+main()
 
 // necessary for functional tests,
 // so we can mock url in Selenium and still
 // fire tab listeners
 module.exports = {
-	tabOnUpdatedListeners: [populatePopup]
+	tabOnUpdatedListeners: [tabOnUpdatedListener]
 }
