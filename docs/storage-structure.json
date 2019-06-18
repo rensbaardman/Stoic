@@ -1,0 +1,25 @@
+// example of structure of storage
+
+{
+
+	"_global": {
+		"_categories": {
+			"logo": true,
+			"related": false
+		}
+	},
+
+	"example.com": {
+		"_status": true,
+		"_categories": {
+			"logo": false,
+			"related": true
+		},
+		"hide-related-menu": false,
+		"hide-facebook-logo": true,
+		// ...
+	},
+
+	// ...
+
+}
