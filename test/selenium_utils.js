@@ -102,7 +102,6 @@ async function get_extension_id() {
 			// then the second div
 			// and then dd
 			element = await this.wait(until.elementLocated(By.xpath('//dd[text()="Stoic@rensbaardman.nl"]/../..//div[2]/dd')), 2000);
-			// element = await this.findElement(By.xpath('//dd[text()="Stoic@rensbaardman.nl"]/../..//div[2]/dd'))
 
 		}
 		else {
@@ -151,9 +150,12 @@ function get_shadow_root(element) {
 	return this.executeScript("return arguments[0].shadowRoot", element);
 }
 
-async function get_extension_base_url(id) {
+async function get_extension_base_url() {
+
+	if (this.extension_base_url !== undefined) { return this.extension_base_url; }
 
 	let browser_name = await this.get_browser_name();
+	let id = await this.get_extension_id()
 
 	if (browser_name === 'firefox') {
 		return `moz-extension://${id}`
@@ -164,12 +166,21 @@ async function get_extension_base_url(id) {
 	}
 }
 
+async function get_extension_relative_url(relative_path) {
+	let base_url = await this.get_extension_base_url();
+	return `${base_url}/${relative_path}`
+}
+
 async function get_popup_url() {
 	if (this.popup_url !== undefined) { return this.popup_url; }
-	let id = await this.get_extension_id()
-	let base_url = await this.get_extension_base_url(id)
-	this.popup_url = `${base_url}/popup/popup.html`
+	this.popup_url = await this.get_extension_relative_url('popup/popup.html')
 	return this.popup_url
+}
+
+async function get_background_page_url() {
+	if (this.background_page_url !== undefined) { return this.background_page_url }
+	this.background_page_url = await this.get_extension_relative_url('_generated_background_page.html')
+	return this.background_page_url
 }
 
 // TODO: this could be done cleaner with sending 'COMMAND/CONTROL + t', but apparently doesn't work. See https://stackoverflow.com/a/41974917/7770056
@@ -182,8 +193,9 @@ async function open_in_new_tab(url) {
 	return this.get(url);
 }
 
-function open_popup() {
-	return this.get_popup_url().then((popup_url) => this.get(popup_url) )
+async function open_popup() {
+	const popup_url = await this.get_popup_url()
+	return this.get(popup_url)
 }
 
 async function safe_close_window(handle) {
@@ -241,14 +253,20 @@ async function mock_url(url) {
 	let current_url = await this.getCurrentUrl();
 	let popup_url = await this.get_popup_url();
 
-	// only apply in the popup, since else
+	// safety check: only apply in the popup, since else
 	// browser is undefined
 	if (current_url === popup_url) {
+
+		// API: see https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/Tabs/onUpdated
+		const tabId = 0 // some fake tabId.
+		const changeInfo = { url: url} // could add more attributes, but not necessary for now
+		const tab = { active: true } // could add more attributes, but not necessary for now
+
 		// clone old browser.tabs.query to our namespace,
 		// mock the relevant part of browser.tabs.query,
-		// then activate all handlers as if the urls was
+		// then activate all handlers as if the url was
 		// really changed.
-		script = `
+		const script = `
 			var _selenium = { browser: { tabs: { query: browser.tabs.query.bind({}) }}};
 			browser.tabs.query = function(queryInfo) {
 				if (queryInfo = {currentWindow: true, active: true}) {
@@ -260,7 +278,7 @@ async function mock_url(url) {
 			};
 			for (let listener of bundle.tabOnUpdatedListeners) {
 				if (browser.tabs.onUpdated.hasListener(listener)) {
-					listener()
+					listener(${tabId}, ${JSON.stringify(changeInfo)}, ${JSON.stringify(tab)})
 				}
 			}`
 		return this.executeScript(script)
@@ -314,7 +332,9 @@ class ExtendedBuilder extends Builder {
 		driver.get_extension_id = get_extension_id;
 		driver.get_shadow_root = get_shadow_root;
 		driver.get_extension_base_url = get_extension_base_url;
+		driver.get_extension_relative_url = get_extension_relative_url;
 		driver.get_popup_url = get_popup_url;
+		driver.get_background_page_url = get_background_page_url;
 		driver.open_in_new_tab = open_in_new_tab;
 		driver.open_popup = open_popup;
 		driver.safe_close_window = safe_close_window;
