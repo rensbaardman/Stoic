@@ -45,6 +45,7 @@ async function populatePopup() {
 	const main = generateCategories(categories);
 	const footer = generateFooter();
 
+	document.body.classList = [];
 	document.body.innerHTML = `${header}${main}${footer}`;
 
 	addCategoryOnClickHandlers();

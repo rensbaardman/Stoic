@@ -25,40 +25,105 @@ describe('popup', function() {
 		await driver.quit()
 	})
 
-	it("should have 'Stoic' in the title", async function() {
-		// kind of a smoke test
+	describe.skip('initial appearance', () => {
 
-		await driver.open_popup();
+		it("should have 'Stoic' in the title", async () => {
+			// kind of a smoke test
 
-		let header = await driver.findElement(By.css('h1'));
-		let text = await header.getText();
+			await driver.open_popup();
 
-		expect(text).to.equal('Stoic')
+			let header = await driver.findElement(By.css('h1'));
+			let text = await header.getText();
 
-	});
+			expect(text).to.equal('Stoic')
 
-	it("should show the host of the current page", async function() {
-		
-		await driver.open_popup();
-		await driver.mock_url('https://www.my.fake_url.co.uk/folder/directory/index.php');
+		});
 
-		let element = await driver.findElement(By.css('#url'));
+		it("should show the host of the current page", async () => {
 
-		let content = await element.getText();
-		expect(content).to.equal('my.fake_url.co.uk');
+			await driver.open_popup();
+			await driver.mock_url('https://www.my.fake_url.co.uk/folder/directory/index.php');
 
-	});
+			let element = await driver.findElement(By.css('#url'));
 
-	it("should show the categories of the current page", async () => {
+			let content = await element.getText();
+			expect(content).to.equal('my.fake_url.co.uk');
 
-		await driver.open_popup();
-		await driver.mock_url('https://www.example.com/yes/no.html');
+		});
 
-		let category_titles = await driver.findElements(By.css('li.category h3'))
-		let category_texts = await Promise.all(category_titles.map((el) => el.getText()))
+		it("should show the categories of the current page", async () => {
 
-		const expected_categories = ['NO RELATED', 'NO LOGO']
-		assert.deepEqual(category_texts.sort(), expected_categories.sort())
+			await driver.open_popup();
+			await driver.mock_url('https://www.example.com/yes/no.html');
+
+			let category_titles = await driver.findElements(By.css('li.category h3'))
+			let category_texts = await Promise.all(category_titles.map((el) => el.getText()))
+
+			const expected_categories = ['NO RELATED', 'NO LOGO']
+			assert.deepEqual(category_texts.sort(), expected_categories.sort())
+
+		})
+
+	})
+
+	describe('saving settings', () => {
+
+		it('should disable the popup when clicking the status-toggle', async () => {
+
+			await driver.open_popup();
+			let body = driver.findElement(By.css('body'));
+			let classes = await body.getAttribute('class');
+			// sanity check
+			assert.equal(classes, '')
+
+			let label = await driver.findElement(By.css('label[for="toggle-status"]'))
+			// toggle to 'disabled'
+			await label.click();
+
+			classes = await body.getAttribute('class');
+			assert.equal(classes, 'disabled')
+
+		})
+
+
+		it('should contain the disabled state per site', async () => {
+
+			await driver.open_popup();
+			await driver.mock_url('https://example.com')
+			let body = await driver.findElement(By.css('body'));
+
+			let label = await driver.findElement(By.css('label[for="toggle-status"]'))
+			// toggle to 'disabled'
+			await label.click();
+
+			await driver.mock_url('https://some-other-url.com')
+			body = await driver.findElement(By.css('body'));
+			classes = await body.getAttribute('class');
+			// setting example.com to disabled shouldn't have set
+			// some-other-url.com to disabled
+			assert.equal(classes, '')
+
+		})
+
+		it('should persist the disabled states per site', async () => {
+
+			await driver.open_popup();
+			await driver.mock_url('https://example.com')
+
+			let label = await driver.findElement(By.css('label[for="toggle-status"]'))
+			// toggle to 'disabled'
+			await label.click();
+
+			await driver.mock_url('https://some-other-url.com')
+			await driver.mock_url('https://example.com')
+
+			let body = await driver.findElement(By.css('body'));
+			let classes = await body.getAttribute('class');
+			// should have saved the state after refresh
+			assert.equal(classes, 'disabled')
+
+		})
+
 
 	})
 
