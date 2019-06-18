@@ -5,6 +5,30 @@ const {By, Key, until} = require('selenium-webdriver');
 const {setup_driver} = require('../selenium_utils.js')
 
 
+async function assert_popup_status(driver, status) {
+	const current_url = await driver.getCurrentUrl();
+	const popup_url = await driver.get_popup_url();
+	if (current_url !== popup_url) {
+		throw new Error(`assert_popup_status() can only be called when in popup, currently in ${current_url}`)
+	}
+
+	let body = await driver.findElement(By.css('body'));
+	let classes = await body.getAttribute('class');
+
+	let status_span = await driver.findElement(By.css('#status'));
+	let status_message = await status_span.getText();
+
+	if (status === 'active') {
+		assert.equal(classes, '')
+		assert.equal(status_message, 'active')
+	} else if (status === 'disabled') {
+		assert.equal(classes, 'disabled')
+		assert.equal(status_message, 'disabled')
+	} else {
+		throw new Error(`status to assert_popup_status() should be either 'active' or 'disabled', not ${status}`)
+	}
+}
+
 describe('popup', function() {
 
 	this.timeout(20000);
@@ -31,7 +55,7 @@ describe('popup', function() {
 
 			await driver.open_popup();
 
-			let title = await driver.findElement(By.css('h1'));
+			let title = await driver.wait(until.elementLocated(By.css('h1')));
 			let title_text = await title.getText();
 
 			expect(title_text).to.equal('Stoic')
@@ -54,11 +78,20 @@ describe('popup', function() {
 			await driver.open_popup();
 			await driver.mock_url('https://www.example.com/yes/no.html');
 
+			// fix to force wait for category elements to load
+			await driver.wait(until.elementLocated(By.css('li.category :first-child')));
+
 			let category_titles = await driver.findElements(By.css('li.category h3'))
 			let category_texts = await Promise.all(category_titles.map((el) => el.getText()))
-
 			const expected_categories = ['NO RELATED', 'NO LOGO']
 			assert.deepEqual(category_texts.sort(), expected_categories.sort())
+
+		})
+
+		it('should be active', async () => {
+
+			await driver.open_popup();
+			await assert_popup_status(driver, 'active')
 
 		})
 
@@ -69,17 +102,11 @@ describe('popup', function() {
 		it('should disable the popup when clicking the status-toggle', async () => {
 
 			await driver.open_popup();
-			let body = driver.findElement(By.css('body'));
-			let classes = await body.getAttribute('class');
-			// sanity check
-			assert.equal(classes, '')
 
-			let label = await driver.findElement(By.css('label[for="toggle-status"]'))
+			let label = await driver.wait(until.elementLocated(By.css('label[for="toggle-status"]')));
 			// toggle to 'disabled'
 			await label.click();
-
-			classes = await body.getAttribute('class');
-			assert.equal(classes, 'disabled')
+			await assert_popup_status(driver, 'disabled')
 
 		})
 
@@ -88,18 +115,15 @@ describe('popup', function() {
 
 			await driver.open_popup();
 			await driver.mock_url('https://example.com')
-			let body = await driver.findElement(By.css('body'));
 
 			let label = await driver.findElement(By.css('label[for="toggle-status"]'))
 			// toggle to 'disabled'
 			await label.click();
 
 			await driver.mock_url('https://some-other-url.com')
-			body = await driver.findElement(By.css('body'));
-			classes = await body.getAttribute('class');
 			// setting example.com to disabled shouldn't have set
 			// some-other-url.com to disabled
-			assert.equal(classes, '')
+			await assert_popup_status(driver, 'active')
 
 		})
 
@@ -115,10 +139,8 @@ describe('popup', function() {
 			await driver.mock_url('https://some-other-url.com')
 			await driver.mock_url('https://example.com')
 
-			let body = await driver.findElement(By.css('body'));
-			let classes = await body.getAttribute('class');
 			// should have saved the state after refresh
-			assert.equal(classes, 'disabled')
+			await assert_popup_status(driver, 'disabled')
 
 		})
 
