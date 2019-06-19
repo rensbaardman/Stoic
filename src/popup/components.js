@@ -17,7 +17,7 @@ function generateCategories(categories) {
 	// containing category objects
 	return `<main>
 	<ul class="categories">
-		${categories.map((cat) => generateCategory(cat)).join('\n')}
+		${categories.map(generateCategory).join('\n')}
 	</ul>
 </main>`
 }
@@ -37,7 +37,7 @@ function generateCategory(category) {
 	</div>
 
 	<ul class="rules">
-		${category.rules.map((rule) => generateRule(rule)).join('\n')}
+		${category.rules.map(generateRule).join('\n')}
 	</ul>
 
 </li>`
