@@ -58,6 +58,7 @@ async function assert_category_status(driver, cat_id, status) {
 describe('popup', function() {
 
 	this.timeout(20000);
+	this.slow(2000);
 
 	var driver;
 
@@ -95,6 +96,9 @@ describe('popup', function() {
 			await driver.open_popup();
 			await driver.mock_url('https://www.my.fake_url.co.uk/folder/directory/index.php');
 
+			// this test is flaky...
+			await driver.sleep(500)
+
 			let element = await driver.findElement(By.css('#url'));
 
 			let content = await element.getText();
@@ -120,7 +124,7 @@ describe('popup', function() {
 		it("attaches proper 'for' to the categories' labels", async () => {
 
 			await driver.open_popup();
-			await driver.mock_url('https://www.example.com/yes/no.html');
+			await driver.mock_url('https://www.example.com/');
 
 			// fix to force wait for category elements to load
 			await driver.wait(until.elementLocated(By.css('li.category :first-child')));
@@ -128,6 +132,23 @@ describe('popup', function() {
 			// should not raise NoSuchElementError
 			let related_toggle = await driver.findElement(By.css('label[for="toggle-related"]'))
 
+		})
+
+		it("clicking on a category opens it", async function() {
+
+			await driver.open_popup();
+			await driver.mock_url('https://www.example.com/');
+
+			// fix to force wait for category elements to load
+			await driver.wait(until.elementLocated(By.css('li.category :first-child')));
+
+			const related_cat = await driver.findElement(By.css('#cat-related .category-name'))
+			await related_cat.click()
+
+			const related_cat_parent = await driver.findElement(By.css('#cat-related'))
+			const classes = await related_cat_parent.getAttribute('class')
+
+			assert.include(classes, 'opened')
 
 		})
 

@@ -16,7 +16,18 @@ function addCategoryOnClickHandlers() {
 	const categories = document.getElementsByClassName('category-name');
 	for (let el of categories) {
 		el.onclick = function(event) {
-			toggle(el.parentElement, 'opened')
+			const target_name = event.target.tagName.toLowerCase()
+			// since clicks on the label also causes an onClick
+			// (bubble) event, which also generates an input click,
+			// this prevents double toggling of the 'opened' status
+			// (not filtering wouldn't have a cosmetic effects,
+			// since double toggling cancels each other, but still)
+			// (Note: you should be able to stop event bubbling from
+			// label.onclick with event.stopPropagation(), but somehow
+			// this doesn't work)
+			if (target_name === 'div' || target_name === 'h3') {
+				toggle(el.parentElement, 'opened')
+			}
 		}
 	}
 }
