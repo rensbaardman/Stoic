@@ -286,7 +286,7 @@ async function mock_url(url) {
 		// Apparently this.executeScript returns before the script
 		// has actually fully executed. Or at least before
 		// all consequences have been followed.
-		return this.sleep(500)
+		return this.sleep(1000)
 	}
 	else {
 		throw new Error(`url can only be mocked within the popup, current_url is: ${current_url}`)

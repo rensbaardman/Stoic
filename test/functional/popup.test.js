@@ -1,7 +1,5 @@
-const should = require('chai').should(),
-      assert = require('chai').assert,
-      expect = require('chai').expect;
-const {By, Key, until} = require('selenium-webdriver');
+const {assert} = require('chai');
+const {By, until} = require('selenium-webdriver');
 const {setup_driver} = require('../selenium_utils.js')
 
 
@@ -15,7 +13,7 @@ async function assert_popup_status(driver, status) {
 	let body = await driver.findElement(By.css('body'));
 	let classes = await body.getAttribute('class');
 
-	let status_span = await driver.findElement(By.css('#status'));
+	let status_span = await driver.wait(until.elementLocated(By.css('#status')));
 	let status_message = await status_span.getText();
 
 	if (status === 'active') {
@@ -50,18 +48,21 @@ describe('popup', function() {
 
 	describe('initial appearance', () => {
 
-		it("should have 'Stoic' in the title", async () => {
-			// kind of a smoke test
+		it('is active', async () => {
+			await driver.open_popup();
+			await assert_popup_status(driver, 'active')
+		})
 
+		it("has 'Stoic' in the title", async () => {
 			await driver.open_popup();
 
 			let title = await driver.wait(until.elementLocated(By.css('h1')));
 			let title_text = await title.getText();
 
-			expect(title_text).to.equal('Stoic')
+			assert.equal(title_text, 'Stoic')
 		});
 
-		it("should show the host of the current page", async () => {
+		it("shows the host of the current page", async () => {
 
 			await driver.open_popup();
 			await driver.mock_url('https://www.my.fake_url.co.uk/folder/directory/index.php');
@@ -69,11 +70,11 @@ describe('popup', function() {
 			let element = await driver.findElement(By.css('#url'));
 
 			let content = await element.getText();
-			expect(content).to.equal('my.fake_url.co.uk');
+			assert.equal(content, 'my.fake_url.co.uk');
 
 		});
 
-		it("should show the categories of the current page", async () => {
+		it("shows the categories of the current page", async () => {
 
 			await driver.open_popup();
 			await driver.mock_url('https://www.example.com/yes/no.html');
@@ -102,18 +103,13 @@ describe('popup', function() {
 
 		})
 
-		it('should be active', async () => {
 
-			await driver.open_popup();
-			await assert_popup_status(driver, 'active')
-
-		})
 
 	})
 
 	describe('saving settings', () => {
 
-		it('should disable the popup when clicking the status-toggle', async () => {
+		it('disables the popup when clicking the status-toggle', async () => {
 
 			await driver.open_popup();
 
@@ -124,8 +120,24 @@ describe('popup', function() {
 
 		})
 
+		it('saves the popup states', async () => {
 
-		it('should contain the disabled state per site', async () => {
+			await driver.open_popup();
+			await driver.mock_url('https://example.com')
+
+			let label = await driver.findElement(By.css('label[for="toggle-status"]'))
+			// toggle to 'disabled'
+			await label.click();
+
+			await driver.mock_url('https://some-other-url.com')
+			await driver.mock_url('https://example.com')
+
+			// should have saved the state after refresh
+			await assert_popup_status(driver, 'disabled')
+
+		})
+
+		it("doesn't leak the disabled state to other sites", async () => {
 
 			await driver.open_popup();
 			await driver.mock_url('https://example.com')
@@ -141,16 +153,6 @@ describe('popup', function() {
 
 		})
 
-		it('should persist the disabled states per site', async () => {
-
-			await driver.open_popup();
-			await driver.mock_url('https://example.com')
-
-			let label = await driver.findElement(By.css('label[for="toggle-status"]'))
-			// toggle to 'disabled'
-			await label.click();
-
-			await driver.mock_url('https://some-other-url.com')
 			await driver.mock_url('https://example.com')
 
 			// should have saved the state after refresh
