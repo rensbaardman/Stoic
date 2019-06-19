@@ -100,7 +100,7 @@ describe('rule_utils', function() {
 				active: true,
 				overriden: false,
 				opened: false,
-				cat_id: 'related',
+				id: 'related',
 				name: "NO RELATED",
 				rules: []
 			}
@@ -122,7 +122,7 @@ describe('rule_utils', function() {
 				active: true,
 				overriden: false,
 				opened: false,
-				cat_id: 'social',
+				id: 'social',
 				name: "NO SOCIAL",
 				rules: []
 			}
@@ -145,7 +145,7 @@ describe('rule_utils', function() {
 				active: true,
 				overriden: false,
 				opened: false,
-				cat_id: 'social',
+				id: 'social',
 				name: "NO SOCIAL",
 				rules: [
 					{

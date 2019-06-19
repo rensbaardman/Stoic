@@ -46,8 +46,8 @@ async function populatePopup(url) {
 	}
 	const host = extractHost(url)
 
-	const rules = await getRules(host);
-	const categories = constructCategories(rules);
+	const rulesFile = await getRules(host);
+	const categories = constructCategories(rulesFile);
 
 	// always returns an object, and is empty if key not defined
 	const status = await getHostStatus(host);

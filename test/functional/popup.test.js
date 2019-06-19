@@ -88,6 +88,20 @@ describe('popup', function() {
 
 		})
 
+		it("attaches proper 'for' to the categories' labels", async () => {
+
+			await driver.open_popup();
+			await driver.mock_url('https://www.example.com/yes/no.html');
+
+			// fix to force wait for category elements to load
+			await driver.wait(until.elementLocated(By.css('li.category :first-child')));
+
+			// should not raise NoSuchElementError
+			let related_toggle = await driver.findElement(By.css('label[for="toggle-related"]'))
+
+
+		})
+
 		it('should be active', async () => {
 
 			await driver.open_popup();

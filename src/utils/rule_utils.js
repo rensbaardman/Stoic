@@ -36,18 +36,18 @@ async function getRules(host) {
 	}
 }
 
-function constructCategories(rules) {
-	const cat_ids = Object.keys(rules)
-	return cat_ids.map( (id) => constructCategory(id, rules[id]) )
+function constructCategories(rulesFile) {
+	const cat_ids = Object.keys(rulesFile)
+	return cat_ids.map( (id) => constructCategory(id, rulesFile[id]) )
 }
 
-function constructCategory(cat_id, rules) {
+function constructCategory(id, rules) {
 	return {
 		active: true,
 		overriden: false,
 		opened: false,
-		cat_id: cat_id,
-		name: CATEGORIES[cat_id],
+		id: id,
+		name: CATEGORIES[id],
 		rules: rules.map(constructRule)
 	}
 }
