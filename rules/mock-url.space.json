@@ -1,0 +1,16 @@
+{
+	"related": [
+		{
+			"desc": "hide mock 'related articles'",
+			"id": "hide-mock-related-articles",
+			"css": "a { display: none }"
+		}
+	],
+	"stats": [
+		{
+			"desc": "hide stats",
+			"id": "hide-mock-stats",
+			"css":  "h1 { display: none }"
+		}
+	]
+}

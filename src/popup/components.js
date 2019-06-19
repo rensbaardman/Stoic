@@ -24,7 +24,7 @@ function generateCategories(categories) {
 
 function generateCategory(category) {
 	// category should be a Category Object
-	return `<li class="category${category.active ? ' active' : ''}${category.overriden ? ' overriden' : ''}${category.opened ? ' opened' : ''}">
+	return `<li class="category${category.active ? ' active' : ''}${category.overriden ? ' overriden' : ''}${category.opened ? ' opened' : ''}" id="cat-${category.id}">
 
 	<div class="category-name">
 		<span class="override-indicator"></span>

@@ -2,13 +2,17 @@ const {assert} = require('chai');
 const {By, until} = require('selenium-webdriver');
 const {setup_driver} = require('../selenium_utils.js')
 
-
-async function assert_popup_status(driver, status) {
+async function assert_in_popup(driver) {
 	const current_url = await driver.getCurrentUrl();
 	const popup_url = await driver.get_popup_url();
 	if (current_url !== popup_url) {
-		throw new Error(`assert_popup_status() can only be called when in popup, currently in ${current_url}`)
+		throw new Error(`expected to be in popup, but we are currently in ${current_url}`)
 	}
+}
+
+async function assert_popup_status(driver, status) {
+
+	await assert_in_popup(driver);
 
 	let body = await driver.findElement(By.css('body'));
 	let classes = await body.getAttribute('class');
@@ -24,6 +28,30 @@ async function assert_popup_status(driver, status) {
 		assert.equal(status_message, 'disabled')
 	} else {
 		throw new Error(`status to assert_popup_status() should be either 'active' or 'disabled', not ${status}`)
+	}
+}
+
+async function assert_category_status(driver, cat_id, status) {
+
+	await assert_in_popup(driver);
+
+	let category = await driver.findElement(By.css(`li.category#cat-${cat_id}`));
+	let classes = await category.getAttribute('class')
+
+	let input = await driver.findElement(By.css(`input#toggle-${cat_id}`));
+	let input_status = await input.getAttribute('checked')
+
+	if (status === 'active') {
+		// TODO: this is the reverse compared to the body (e.g. add 'active' or add 'disabled') ---> pick one!
+		assert.include(classes, 'active')
+		assert.equal(input_status, 'true')
+	}
+	else if (status === 'disabled') {
+		assert.notInclude(classes, 'active')
+		assert.equal(input_status, 'false')
+	}
+	else {
+		throw new Error(`status to assert_category_status() should be either 'active' or 'disabled', not ${status}`)
 	}
 }
 
@@ -153,10 +181,50 @@ describe('popup', function() {
 
 		})
 
+
+		it('changes category status on toggle', async function() {
+
+			await driver.open_popup();
 			await driver.mock_url('https://example.com')
 
-			// should have saved the state after refresh
-			await assert_popup_status(driver, 'disabled')
+			let related_toggle = await driver.wait(until.elementLocated(By.css('label[for="toggle-related"]')));
+			await related_toggle.click();
+
+			// category 'related' should be disabled
+			await assert_category_status(driver, 'related', 'disabled')
+
+		})
+
+		it('saves the category status', async function() {
+
+			await driver.open_popup();;
+			await driver.mock_url('https://example.com')
+
+			let related_toggle = await driver.wait(until.elementLocated(By.css('label[for="toggle-related"]')));
+			await related_toggle.click();
+
+			await driver.mock_url('https://some-other-url.com')
+			await driver.mock_url('https://example.com')
+
+			// category 'related' should still be be disabled
+			await assert_category_status(driver, 'related', 'disabled')
+
+		})
+
+
+		it("doesn't leak the category state to other sites", async () => {
+
+			await driver.open_popup();;
+			await driver.mock_url('https://example.com')
+
+			let related_toggle = await driver.wait(until.elementLocated(By.css('label[for="toggle-related"]')));
+			await related_toggle.click();
+
+			// we us mock-url since it _does_ have the category
+			// 'related' defined
+			await driver.mock_url('https://mock-url.space')
+			// category 'related' should NOT be disabled
+			await assert_category_status(driver, 'related', 'active')
 
 		})
 
