@@ -39,16 +39,16 @@ async function assert_category_status(driver, cat_id, status) {
 	let classes = await category.getAttribute('class')
 
 	let input = await driver.findElement(By.css(`input#toggle-${cat_id}`));
-	let input_status = await input.getAttribute('checked')
+	let input_status = await input.isSelected()
 
 	if (status === 'active') {
 		// TODO: this is the reverse compared to the body (e.g. add 'active' or add 'disabled') ---> pick one!
 		assert.include(classes, 'active')
-		assert.equal(input_status, 'true')
+		assert.equal(input_status, true)
 	}
 	else if (status === 'disabled') {
 		assert.notInclude(classes, 'active')
-		assert.equal(input_status, 'false')
+		assert.equal(input_status, false)
 	}
 	else {
 		throw new Error(`status to assert_category_status() should be either 'active' or 'disabled', not ${status}`)
@@ -169,7 +169,7 @@ describe('popup', function() {
 
 		})
 
-		it('saves the popup states', async () => {
+		it('saves the popup status', async () => {
 
 			await driver.open_popup();
 			await driver.mock_url('https://example.com')
@@ -206,7 +206,7 @@ describe('popup', function() {
 		it('changes category status on toggle', async function() {
 
 			await driver.open_popup();
-			await driver.mock_url('https://example.com')
+			await driver.mock_url('https://example.com');
 
 			let related_toggle = await driver.wait(until.elementLocated(By.css('label[for="toggle-related"]')));
 			await related_toggle.click();
@@ -218,8 +218,8 @@ describe('popup', function() {
 
 		it('saves the category status', async function() {
 
-			await driver.open_popup();;
-			await driver.mock_url('https://example.com')
+			await driver.open_popup();
+			await driver.mock_url('https://example.com');
 
 			let related_toggle = await driver.wait(until.elementLocated(By.css('label[for="toggle-related"]')));
 			await related_toggle.click();
@@ -235,8 +235,8 @@ describe('popup', function() {
 
 		it("doesn't leak the category state to other sites", async () => {
 
-			await driver.open_popup();;
-			await driver.mock_url('https://example.com')
+			await driver.open_popup();
+			await driver.mock_url('https://example.com');
 
 			let related_toggle = await driver.wait(until.elementLocated(By.css('label[for="toggle-related"]')));
 			await related_toggle.click();

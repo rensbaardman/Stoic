@@ -17,7 +17,17 @@ async function setHostStatus(host, status) {
 	browser.storage.local.set(settings)
 }
 
+async function getCategoryStatus(host, id) {
+	return true
+}
+
+async function setCategoryStatus(host, id, status) {
+
+}
+
 module.exports = {
 	getHostStatus: getHostStatus,
-	setHostStatus: setHostStatus
+	setHostStatus: setHostStatus,
+	getCategoryStatus: getCategoryStatus,
+	setCategoryStatus: setCategoryStatus
 }

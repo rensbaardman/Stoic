@@ -1,6 +1,6 @@
 const {getActiveUrl, extractHost} = require('../utils/url_utils.js')
 const {getRules, constructCategories} = require('../utils/rule_utils.js')
-const {getHostStatus, setHostStatus} = require('../utils/storage_utils.js')
+const {getHostStatus, setHostStatus, getCategorystatus, setCategoryStatus} = require('../utils/storage_utils.js')
 const {generateHeader, generateCategories, generateFooter} = require('./components.js')
 
 function toggle(el, className) {
@@ -12,7 +12,7 @@ function toggle(el, className) {
 	}
 }
 
-function addCategoryOnClickHandlers() {
+function addCategoryOpenHandlers() {
 	const categories = document.getElementsByClassName('category-name');
 	for (let el of categories) {
 		el.onclick = function(event) {
@@ -32,7 +32,7 @@ function addCategoryOnClickHandlers() {
 	}
 }
 
-function addStatusOnClickHandler(host) {
+function addStatusToggleHandler(host) {
 	const status_input = document.getElementById('toggle-status');
 	status_input.onclick = function(event) {
 
@@ -47,6 +47,22 @@ function addStatusOnClickHandler(host) {
 			status.innerText = 'active'
 			setHostStatus(host, true)
 		}
+	}
+}
+
+function addCategoryToggleHandlers(host, categories) {
+	for (let category of categories) {
+		const label = document.querySelector(`label[for='toggle-${category.id}']`)
+		label.onclick = function(event) {
+
+			toggle(document.getElementById(`cat-${category.id}`), 'active')
+
+			const input = label.parentElement.children[0]
+			// this is the _new_ status:
+			const status = input.checked;
+			setCategoryStatus(host, category.id, status)
+		}
+
 	}
 }
 
@@ -73,8 +89,9 @@ async function populatePopup(url) {
 	}
 	document.body.innerHTML = `${header}${main}${footer}`;
 
-	addCategoryOnClickHandlers();
-	addStatusOnClickHandler(host);
+	addCategoryOpenHandlers()
+	addStatusToggleHandler(host);
+	addCategoryToggleHandlers(host, categories);
 }
 
 async function tabOnUpdatedListener(tabId, changeInfo, tab) {
