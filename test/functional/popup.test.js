@@ -256,7 +256,16 @@ describe('popup', function() {
 
 		})
 
-
 	})
+
+	describe('saving rule status', () => {})
+
+
+	describe('errors', () => {
+		it.skip("it can handle storage errors", () => {
+			assert.fail('what to check for?')
+		})
+	})
+
 
 })
