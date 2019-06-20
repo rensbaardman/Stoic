@@ -36,28 +36,59 @@ async function getRules(host) {
 	}
 }
 
-function constructCategories(rulesFile) {
+function constructCategories(rulesFile, settings) {
 	const cat_ids = Object.keys(rulesFile)
-	return cat_ids.map( (id) => constructCategory(id, rulesFile[id]) )
+	return cat_ids.map( (id) => constructCategory(id, rulesFile[id], settings) )
 }
 
-function constructCategory(id, rules) {
+function constructCategory(id, rules, settings) {
+	let cat_status = settings['_categories'][id]
+	if (cat_status === undefined) {
+		cat_status = true
+	}
+
+	let overriden = false;
+	let constructedRules = []
+	for (let rule of rules) {
+		// this might be undefined, but that works too
+		let rule_status = settings[rule.id];
+
+		if (rule_status !== undefined && rule_status !== cat_status) {
+			overriden = true;
+		}
+
+		const rule_obj = constructRule(rule, cat_status, rule_status)
+		constructedRules.push(rule_obj)
+	}
+
 	return {
-		active: true,
-		overriden: false,
+		active: cat_status,
+		overriden: overriden,
 		opened: false,
 		id: id,
 		name: CATEGORIES[id],
-		rules: rules.map(constructRule)
+		rules: constructedRules
 	}
 }
 
-function constructRule(rule) {
+function constructRule(rule, cat_status, status) {
+	if (status === undefined) {
+		status = cat_status
+	}
+
+	let override;
+	if (status === cat_status) {
+		override = false;
+	}
+	else {
+		override = true;
+	}
+
 	return {
-		override: false,
+		override: override,
 		desc: rule.desc,
 		id: rule.id,
-		active: true
+		active: status
 	}
 }
 

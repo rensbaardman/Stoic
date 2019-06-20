@@ -1,6 +1,6 @@
 const {getActiveUrl, extractHost} = require('../utils/url_utils.js')
 const {getRules, constructCategories} = require('../utils/rule_utils.js')
-const {getHostStatus, setHostStatus, getCategorystatus, setCategoryStatus} = require('../utils/storage_utils.js')
+const {getHostStatus, setHostStatus, getCategorystatus, setCategoryStatus, getSettings} = require('../utils/storage_utils.js')
 const {generateHeader, generateCategories, generateFooter} = require('./components.js')
 
 function toggle(el, className) {
@@ -75,10 +75,12 @@ async function populatePopup(url) {
 	const host = extractHost(url)
 
 	const rulesFile = await getRules(host);
-	const categories = constructCategories(rulesFile);
+	const settings = await getSettings(host);
+	const categories = constructCategories(rulesFile, settings);
 
 	// always returns an object, and is empty if key not defined
 	const status = await getHostStatus(host);
+	// TODO: refactor to use the previous settings object - saves a request to storage.
 	const header = generateHeader(host, status);
 	const main = generateCategories(categories);
 	const footer = generateFooter();

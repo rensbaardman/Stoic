@@ -160,7 +160,7 @@ describe('popup', function() {
 
 	})
 
-	describe('saving settings', () => {
+	describe('saving site status', () => {
 
 		it('disables the popup when clicking the status-toggle', async () => {
 
@@ -206,6 +206,9 @@ describe('popup', function() {
 
 		})
 
+	})
+
+	describe('saving category status', () => {
 
 		it('changes category status on toggle', async function() {
 

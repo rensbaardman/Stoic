@@ -82,42 +82,123 @@ describe('rule_utils', function() {
 
 	})
 
+	// parts of these are actually integration tests,
+	// since constructCategories depends on constructCategory,
+	// which depends on constructRule.
+	// TODO: try to uncouple these functions!
 	describe('constructCategories', () => {
 
 		it('should convert an empty rules object to an empty array', () => {
-			const categories = rule_utils.constructCategories({})
+			const categories = rule_utils.constructCategories({}, {'_categories': {}})
 			assert.deepEqual(categories, [])
 		})
 
-		it('should convert a rules object with a category without rules', () => {
+		it('can add complex categories and rules together (INTEGRATION)', () => {
 
-			const rules = {
-				"related": []
+			const rulesFiles = {
+				'logo': [{
+					"desc": 'hide logo',
+					"id": "hide-logo"
+				}],
+				'social': [{
+					"desc": 'hide social',
+					"id": 'hide-social'
+				}],
+				'related': [{
+					"desc": 'hide related',
+					"id": "hide-related"
+				}],
+				'stats': [{
+					"desc": 'hide stats',
+					"id": "hide-stats"
+				}]
 			}
 
-			const categories = rule_utils.constructCategories(rules)
-			const expected_category = {
-				active: true,
-				overriden: false,
-				opened: false,
-				id: 'related',
-				name: "NO RELATED",
-				rules: []
+			const settings = {
+				'_status': 'true',
+				'_categories': {
+					'logo': true,
+					'social': false, // category without rule settings
+					'related': false
+				},
+				'hide-logo': false, // override
+				'hide-related': false, // same as category
+				'hide-stats': false // rule without category settings
 			}
 
-			assert.deepEqual(categories, [expected_category])
+			const expected = [
+				{
+					id: 'logo',
+					name: "NO LOGO",
+					active: true,
+					overriden: true,
+					opened: false,
+
+					rules: [{
+						desc: "hide logo",
+						id: "hide-logo",
+						active: false,
+						override: true
+					}]
+				},
+			{
+					id: 'social',
+					name: "NO SOCIAL",
+					active: false,
+					overriden: false,
+					opened: false,
+
+					rules: [{
+						desc: "hide social",
+						id: "hide-social",
+						active: false,
+						override: false
+					}]
+				},
+			{
+					id: 'related',
+					name: "NO RELATED",
+					active: false,
+					overriden: false,
+					opened: false,
+
+					rules: [{
+						desc: "hide related",
+						id: "hide-related",
+						active: false,
+						override: false
+					}]
+				},
+			{
+					id: 'stats',
+					name: "NO STATS",
+					active: true,
+					overriden: true,
+					opened: false,
+
+					rules: [{
+						desc: "hide stats",
+						id: "hide-stats",
+						active: false,
+						override: true
+					}]
+				}
+			]
 		})
 
-		it.skip('should check the settings to set the properties of categories and rules', () => {
-			assert.fail('finish the test')
+		it.skip('should add the categories in alfabetic / determined order (?!)', () => {
+			assert.fail('determine whether we want this (and which option)')
 		})
 
 	})
 
+	// parts of these are actually integration tests,
+	// since constructCategory depends on constructRule.
+	// TODO: try to uncouple these functions!
 	describe('constructCategory', () => {
 
 		it('should construct a category object even without rules', () => {
-			const category = rule_utils.constructCategory('social', []);
+			const category = rule_utils.constructCategory('social', [], {'_categories': {}});
 			const expected_category = {
 				active: true,
 				overriden: false,
@@ -129,7 +210,7 @@ describe('rule_utils', function() {
 			assert.deepEqual(category, expected_category)
 		})
 
-		it('should construct a category object with rules', () => {
+		it('can construct a category object with rules (INTEGRATION)', () => {
 			const rule1 = {
 				"desc": "hide logotitle",
 				"id": "hide-logotitle",
@@ -140,7 +221,7 @@ describe('rule_utils', function() {
 				"id": "hide-something-else",
 				"css":  "h3 { display: none }"
 			}
-			const category = rule_utils.constructCategory('social', [rule1, rule2]);
+			const category = rule_utils.constructCategory('social', [rule1, rule2], {'_categories': {}});
 			const expected_category = {
 				active: true,
 				overriden: false,
@@ -164,8 +245,83 @@ describe('rule_utils', function() {
 			}
 			assert.deepEqual(category, expected_category)
 		})
-		it.skip('should check the settings to set the properties of the category', () => {
-			assert.fail('finish the test')
+
+
+		it('checks the settings to set the properties of categories', () => {
+			const settings = {
+				'_categories': {
+					'related': false
+				}
+			}
+			const categories = rule_utils.constructCategory('related', [], settings)
+			const expected_category = {
+				active: false,
+				overriden: false,
+				opened: false,
+				id: 'related',
+				name: "NO RELATED",
+				rules: []
+			}
+			assert.deepEqual(categories, expected_category)
+		})
+
+		it('checks the settings to set the properties of rules (INTEGRATION)', () => {
+			const rules = [{
+				"desc": "hide logotitle",
+				"id": "hide-logotitle",
+				"css":  "h1 { display: none }"
+			}]
+			const settings = {
+				'_categories': {
+					'logo': false
+				},
+				'hide-logotitle': false
+			}
+			const categories = rule_utils.constructCategory('logo', rules, settings)
+			const expected_category = {
+				active: false,
+				overriden: false,
+				opened: false,
+				id: 'logo',
+				name: "NO LOGO",
+				rules: [{
+					override: false,
+					desc: "hide logotitle",
+					id: "hide-logotitle",
+					active: false
+				}]
+			}
+			assert.deepEqual(categories, expected_category)
+		})
+
+		it('sets override statuses correctly (INTEGRATION)', () => {
+			const rules = [{
+				"desc": "hide logotitle",
+				"id": "hide-logotitle",
+				"css":  "h1 { display: none }"
+			}]
+
+			const settings = {
+				'_categories': {
+					'logo': false
+				},
+				'hide-logotitle': true // this is the override!
+			}
+			const categories = rule_utils.constructCategory('logo', rules, settings)
+			const expected_category = {
+				active: false,
+				overriden: true, // overriden
+				opened: false,
+				id: 'logo',
+				name: "NO LOGO",
+				rules: [{
+					override: true, // is override
+					desc: "hide logotitle",
+					id: "hide-logotitle",
+					active: true // should be true
+				}]
+			}
+			assert.deepEqual(categories, expected_category)
 		})
 
 	})
@@ -178,7 +334,7 @@ describe('rule_utils', function() {
 				"id": "hide-logotitle",
 				"css":  "h1 { display: none }"
 			}
-			const rule_obj = rule_utils.constructRule(rule)
+			const rule_obj = rule_utils.constructRule(rule, true)
 			const expected_rule_obj = {
 				override: false,
 				desc: "hide logotitle",
@@ -188,8 +344,36 @@ describe('rule_utils', function() {
 			assert.deepEqual(rule_obj, expected_rule_obj)
 		})
 
-		it.skip('should check the settings to set the properties of rules', () => {
-			assert.fail('finish the test')
+		it('uses the category status to determine its own status', () => {
+			const rule = {
+				"desc": "hide logotitle",
+				"id": "hide-logotitle",
+				"css":  "h1 { display: none }"
+			}
+			const rule_obj = rule_utils.constructRule(rule, false) // now: category_status is false
+			const expected_rule_obj = {
+				override: false,
+				desc: "hide logotitle",
+				id: "hide-logotitle",
+				active: false
+			}
+			assert.deepEqual(rule_obj, expected_rule_obj)
+		})
+
+		it('determines overrides correctly', () => {
+			const rule = {
+				"desc": "hide logotitle",
+				"id": "hide-logotitle",
+				"css":  "h1 { display: none }"
+			}
+			const rule_obj = rule_utils.constructRule(rule, false, true) // now: category_status is false, but rule overrides it!
+			const expected_rule_obj = {
+				override: true,
+				desc: "hide logotitle",
+				id: "hide-logotitle",
+				active: true
+			}
+			assert.deepEqual(rule_obj, expected_rule_obj)
 		})
 
 	})
