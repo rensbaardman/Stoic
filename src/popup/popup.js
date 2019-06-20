@@ -33,12 +33,12 @@ function addCategoryOpenHandlers() {
 }
 
 function addStatusToggleHandler(host) {
-	const status_input = document.getElementById('toggle-status');
+	let status_input = document.getElementById('toggle-status');
 	status_input.onclick = function(event) {
 
 		toggle(document.body, 'disabled');
 
-		const status = document.getElementById('status');
+		let status = document.getElementById('status');
 		if (status.innerText === 'active') {
 			status.innerText = 'disabled'
 			setHostStatus(host, false)
@@ -58,9 +58,10 @@ function addCategoryToggleHandlers(host, categories) {
 			toggle(document.getElementById(`cat-${category.id}`), 'active')
 
 			const input = label.parentElement.children[0]
-			// this is the _new_ status:
-			const status = input.checked;
-			setCategoryStatus(host, category.id, status)
+			// this is the _old_ status:
+			const old_status = input.checked;
+			const new_status = !old_status;
+			setCategoryStatus(host, category.id, new_status)
 		}
 
 	}
