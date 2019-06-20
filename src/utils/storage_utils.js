@@ -1,3 +1,5 @@
+const defaults = require('./defaults.js')
+
 async function getSettings(host) {
 	const response = await browser.storage.local.get({[host]: {} })
 	let settings = response[host]
@@ -9,15 +11,12 @@ async function getSettings(host) {
 	return settings
 }
 
-async function getHostStatus(host) {
-	// Setting a default ensures '_status' is always
-	// available in the storage response. This simplifies
-	// the handling logic.
-	const default_response = { '_status': true }
-	// putting brackets around [host] evaluates the variable
-	// as a key (ES6)
-	const settings = await browser.storage.local.get({[host]: default_response});
-	return settings[host]['_status']
+function getHostStatus(settings) {
+	if (settings['_status'] !== undefined) {
+		return settings['_status']
+	} else {
+		return defaults.SITE_STATUS;
+	}
 }
 
 async function setHostStatus(host, status) {

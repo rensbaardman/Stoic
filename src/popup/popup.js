@@ -1,7 +1,8 @@
-const {getActiveUrl, extractHost} = require('../utils/url_utils.js')
+const {getActiveHost, extractHost} = require('../utils/url_utils.js')
 const {getRules, constructCategories} = require('../utils/rule_utils.js')
 const {getHostStatus, setHostStatus, getCategorystatus, setCategoryStatus, getSettings} = require('../utils/storage_utils.js')
-const {generateHeader, generateCategories, generateFooter} = require('./components.js')
+const {generateBody, generateHeader, generateCategories, generateFooter} = require('./components.js')
+
 
 function toggle(el, className) {
 	if (el.classList.contains(className)) {
@@ -32,10 +33,10 @@ function addCategoryOpenHandlers() {
 	}
 }
 
-function addStatusToggleHandler(host) {
-	let status_input = document.getElementById('toggle-status');
-	status_input.onclick = function(event) {
-
+// TODO: refactor the following functions with
+// .bind(null, ..., ...)
+function generateStatusToggleHandler(host) {
+	return function(event) {
 		toggle(document.body, 'disabled');
 
 		let status = document.getElementById('status');
@@ -50,51 +51,59 @@ function addStatusToggleHandler(host) {
 	}
 }
 
-function addCategoryToggleHandlers(host, categories) {
-	for (let category of categories) {
-		const label = document.querySelector(`label[for='toggle-${category.id}']`)
-		label.onclick = function(event) {
-
-			toggle(document.getElementById(`cat-${category.id}`), 'active')
-
-			const input = label.parentElement.children[0]
-			// this is the _old_ status:
-			const old_status = input.checked;
-			const new_status = !old_status;
-			setCategoryStatus(host, category.id, new_status)
-		}
-
+function generateCategoryToggleHandler(host, label, cat_id) {
+	return function(event) {
+		toggle(document.getElementById(`cat-${cat_id}`), 'active')
+		const input = label.parentElement.children[0]
+		const new_status = !input.checked;
+		setCategoryStatus(host, cat_id, new_status)
 	}
 }
 
-async function populatePopup(url) {
+function addToggleHandlers(host) {
+	const labels = document.getElementsByTagName('label')
 
-	if (url === undefined) {
-		url = await getActiveUrl();
+	for (let label of labels) {
+		// slice(7) gets rid of 'toggle-'
+		const label_for = label.htmlFor.slice(7)
+
+		if (label_for === 'status') {
+			label.onclick = generateStatusToggleHandler(host)
+		}
+		else if (label_for.startsWith('rule-')) {
+			const rule_id = label_for.slice(5)
+			// TODO!
+		}
+		else if (label_for.startsWith('cat-')){
+			const cat_id = label_for.slice(4)
+			label.onclick = generateCategoryToggleHandler(host, label, cat_id)
+		}
+		else {
+			throw new Error(`label_for is ${label_for}, expected either 'status', 'cat-*' or 'rule-*'`)
+		}
 	}
-	const host = extractHost(url)
 
+}
+
+async function generatePopup(host) {
 	const rulesFile = await getRules(host);
 	const settings = await getSettings(host);
 	const categories = constructCategories(rulesFile, settings);
+	const status = getHostStatus(settings);
 
-	// always returns an object, and is empty if key not defined
-	const status = await getHostStatus(host);
-	// TODO: refactor to use the previous settings object - saves a request to storage.
 	const header = generateHeader(host, status);
 	const main = generateCategories(categories);
 	const footer = generateFooter();
 
-	if (status === true) {
-		document.body.classList = [];
-	} else {
-		document.body.classList = ['disabled']
-	}
-	document.body.innerHTML = `${header}${main}${footer}`;
+	return generateBody(header, main, footer, status);
+}
+
+async function populatePopup(host) {
+
+	document.body.outerHTML = await generatePopup(host)
 
 	addCategoryOpenHandlers()
-	addStatusToggleHandler(host);
-	addCategoryToggleHandlers(host, categories);
+	addToggleHandlers(host)
 }
 
 async function tabOnUpdatedListener(tabId, changeInfo, tab) {
@@ -111,20 +120,20 @@ async function tabOnUpdatedListener(tabId, changeInfo, tab) {
 	// (else url update in other window - which has its own active tab (?)
 	// - will change the url in this windows popup)
 
-	const active_url = await getActiveUrl();
-	// _current_url is what we think the current url
+	const activeHost = await getActiveHost();
+	// _currentHost is what we think the current host
 	// is, so if that's not correct: take action.
-	if (active_url !== _current_url) {
-		_current_url = active_url;
-		populatePopup(_current_url)
+	if (activeHost !== _currentHost) {
+		_currentHost = activeHost;
+		populatePopup(_currentHost)
 	}
 }
 browser.tabs.onUpdated.addListener(tabOnUpdatedListener);
 
-let _current_url;
+let _currentHost;
 async function main() {
-	_current_url = await getActiveUrl();
-	populatePopup(_current_url)
+	_currentHost = await getActiveHost();
+	populatePopup(_currentHost)
 }
 
 main()

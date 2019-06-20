@@ -1,3 +1,11 @@
+function generateBody(header, main, footer, status) {
+	return `<body${status ? '>' : ' class="disabled">'}
+	${header}
+	${main}
+	${footer}
+</body>`
+}
+
 function generateHeader(host, active) {
 	return `<header>
 	<img id="logo" src="../assets/stoic-48.png" />
@@ -31,8 +39,8 @@ function generateCategory(category) {
 		<h3>${category.name}</h3>
 
 		<div class="toggle">
-			<input type="checkbox" id="toggle-${category.id}"${category.active ? ' checked' : ''} />
-			<label for="toggle-${category.id}"></label>
+			<input type="checkbox" id="toggle-cat-${category.id}"${category.active ? ' checked' : ''} />
+			<label for="toggle-cat-${category.id}"></label>
 		</div>
 	</div>
 
@@ -61,6 +69,7 @@ function generateFooter() {
 
 
 module.exports = {
+	generateBody: generateBody,
 	generateHeader: generateHeader,
 	generateCategories: generateCategories,
 	generateCategory: generateCategory,

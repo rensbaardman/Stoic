@@ -195,7 +195,9 @@ async function open_in_new_tab(url) {
 
 async function open_popup() {
 	const popup_url = await this.get_popup_url()
-	return this.get(popup_url)
+	await this.get(popup_url)
+	// allow handlers to settle
+	return this.sleep(200)
 }
 
 async function safe_close_window(handle) {

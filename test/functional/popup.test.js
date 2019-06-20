@@ -38,7 +38,7 @@ async function assert_category_status(driver, cat_id, status) {
 	let category = await driver.findElement(By.css(`li.category#cat-${cat_id}`));
 	let classes = await category.getAttribute('class')
 
-	let input = await driver.findElement(By.css(`input#toggle-${cat_id}`));
+	let input = await driver.findElement(By.css(`input#toggle-cat-${cat_id}`));
 	let input_status = await input.isSelected()
 
 	if (status === 'active') {
@@ -57,7 +57,7 @@ async function assert_category_status(driver, cat_id, status) {
 
 describe('popup', function() {
 
-	this.timeout(20000);
+	this.timeout(10000);
 	this.slow(2000);
 
 	var driver;
@@ -114,6 +114,7 @@ describe('popup', function() {
 
 			await driver.open_popup();
 			await driver.mock_url('https://www.example.com/yes/no.html');
+			console.log('url should have been mocked by now!')
 
 			// fix to force wait for category elements to load
 			await driver.wait(until.elementLocated(By.css('li.category :first-child')));
@@ -134,7 +135,7 @@ describe('popup', function() {
 			await driver.wait(until.elementLocated(By.css('li.category :first-child')));
 
 			// should not raise NoSuchElementError
-			let related_toggle = await driver.findElement(By.css('label[for="toggle-related"]'))
+			let related_toggle = await driver.findElement(By.css('label[for="toggle-cat-related"]'))
 
 		})
 
@@ -215,7 +216,7 @@ describe('popup', function() {
 			await driver.open_popup();
 			await driver.mock_url('https://example.com');
 
-			let related_toggle = await driver.wait(until.elementLocated(By.css('label[for="toggle-related"]')));
+			let related_toggle = await driver.wait(until.elementLocated(By.css('label[for="toggle-cat-related"]')));
 			await related_toggle.click();
 
 			// category 'related' should be disabled
@@ -228,7 +229,7 @@ describe('popup', function() {
 			await driver.open_popup();
 			await driver.mock_url('https://example.com');
 
-			let related_toggle = await driver.wait(until.elementLocated(By.css('label[for="toggle-related"]')));
+			let related_toggle = await driver.wait(until.elementLocated(By.css('label[for="toggle-cat-related"]')));
 			await related_toggle.click();
 
 			await driver.mock_url('https://some-other-url.com')
@@ -245,7 +246,7 @@ describe('popup', function() {
 			await driver.open_popup();
 			await driver.mock_url('https://example.com');
 
-			let related_toggle = await driver.wait(until.elementLocated(By.css('label[for="toggle-related"]')));
+			let related_toggle = await driver.wait(until.elementLocated(By.css('label[for="toggle-cat-related"]')));
 			await related_toggle.click();
 
 			// we us mock-url since it _does_ have the category
@@ -262,8 +263,15 @@ describe('popup', function() {
 
 
 	describe('errors', () => {
+
 		it.skip("it can handle storage errors", () => {
 			assert.fail('what to check for?')
+			// i.e. when does browser.storage.local.get() error?
+			// when max storage has been reached?
+		})
+
+		it.skip('can handle race conditions in saving [category / site / rule] status', () => {
+			assert.fail('does this ever happen? How to check for it? (very quickly sending two category changes and hoping they clash?')
 		})
 	})
 

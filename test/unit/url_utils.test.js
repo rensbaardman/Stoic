@@ -75,6 +75,20 @@ describe('url_utils', function() {
 			assert.deepEqual(hosts, expected_hosts)
 		})
 
+	describe('getActiveHost', function() {
+
+		it('returns a Promise', function() {
+			let result = url_utils.getActiveHost();
+			expect(result).to.be.an.instanceof(Promise);
+		})
+
+		it('returns the host of the active window', async function() {
+			let result = await url_utils.getActiveHost();
+			expect(result).to.equal('example.com')
+		})
+
+	})
+
 	})
 
 })

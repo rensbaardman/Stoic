@@ -26,7 +26,13 @@ function extractHost(url) {
 	}
 }
 
+async function getActiveHost() {
+	const activeUrl = await getActiveUrl();
+	return extractHost(activeUrl);
+}
+
 module.exports = {
 	getActiveUrl: getActiveUrl,
+	getActiveHost: getActiveHost,
 	extractHost: extractHost
 }
