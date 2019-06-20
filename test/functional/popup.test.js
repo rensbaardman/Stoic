@@ -94,15 +94,19 @@ describe('popup', function() {
 		it("shows the host of the current page", async () => {
 
 			await driver.open_popup();
-			await driver.mock_url('https://www.my.fake_url.co.uk/folder/directory/index.php');
 
-			// this test is flaky...
-			await driver.sleep(500)
+			async function new_url_shown() {
+				// somehow, the url-mocking doesn't always work the first time
+				await driver.mock_url('https://www.my.fake_url.co.uk/folder/directory/index.php');
+				let element = await driver.findElement(By.css('#url'));
 
-			let element = await driver.findElement(By.css('#url'));
-
-			let content = await element.getText();
-			assert.equal(content, 'my.fake_url.co.uk');
+				let content = await element.getText();
+				if (content === 'my.fake_url.co.uk') {
+					return true
+				}
+			}
+			// should not time out with TimeoutError
+			await driver.wait(new_url_shown, 3000, "expected url to be 'my.fake_url.co.uk'")
 
 		});
 
