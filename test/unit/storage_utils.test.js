@@ -24,34 +24,21 @@ describe('storage_utils', function() {
 
 	describe('getHostStatus', () => {
 
-		it('returns a promise', () => {
-			storage_get_stub.withArgs().resolves({ 'some-key': { _status: 'whatever'}})
-			const response = storage_utils.getHostStatus('some-key')
-			assert.instanceOf(response, Promise);
+		it('returns the default for settings without _status', () => {
+			const defaults = require('../../src/utils/defaults.js')
+			const status = storage_utils.getHostStatus({})
+			assert.equal(status, defaults.SITE_STATUS)
 		})
 
-		it('returns true for non-existing keys', async () => {
-			const expected_arg = { 'non-existing-key.com': { '_status': true }}
-			storage_get_stub.withArgs(expected_arg).resolves(expected_arg);
-			const status = await storage_utils.getHostStatus('non-existing-key.com')
-			assert.equal(status, true)
-		})
-
-		it('returns saved value for existing keys', async () => {
-			const response = {
-				'some-existing-key.com': {
-					'_status': false,
-					'my-rule': true,
-					'my-other-rule': false,
-					'_categories': {
-						'logo': false,
-						'social': true
-					}
-				}
+		it('returns _status for settings that do have _status', async () => {
+			const settings = {
+				'_status': false,
+				'_categories': {
+					'mumbo': 'jumbo'
+				},
+				'something': true
 			}
-			const expected_arg = { 'some-existing-key.com': { '_status': true }}
-			storage_get_stub.withArgs(expected_arg).resolves(response);
-			const status = await storage_utils.getHostStatus('some-existing-key.com')
+			const status = storage_utils.getHostStatus(settings)
 			assert.equal(status, false)
 		})
 
