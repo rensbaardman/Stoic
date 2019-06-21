@@ -100,6 +100,8 @@ async function generatePopup(host) {
 
 async function populatePopup(host) {
 
+	// Interestingly, the following adds a harmless empty
+	// <head></head> tag. See https://stackoverflow.com/questions/52888347/setting-document-body-outerhtml-creates-empty-heads-why
 	document.body.outerHTML = await generatePopup(host)
 
 	addCategoryOpenHandlers()
