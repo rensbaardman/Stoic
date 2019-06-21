@@ -17,14 +17,19 @@ async function assert_popup_status(driver, status) {
 	let body = await driver.findElement(By.css('body'));
 	let classes = await body.getAttribute('class');
 
+	let input = await driver.findElement(By.css('input#toggle-status'));
+	let input_status = await input.isSelected()
+
 	let status_span = await driver.wait(until.elementLocated(By.css('#status')));
 	let status_message = await status_span.getText();
 
 	if (status === 'active') {
 		assert.equal(classes, '')
+		assert.equal(input_status, true)
 		assert.equal(status_message, 'active')
 	} else if (status === 'disabled') {
 		assert.equal(classes, 'disabled')
+		assert.equal(input_status, false)
 		assert.equal(status_message, 'disabled')
 	} else {
 		throw new Error(`status to assert_popup_status() should be either 'active' or 'disabled', not ${status}`)
