@@ -1,8 +1,4 @@
-const CATEGORIES = {
-	'related': 'NO RELATED',
-	'social': 'NO SOCIAL',
-	'logo': "NO LOGO"
-}
+const {CATEGORIES} = require('./constants.js')
 
 async function getRules(host) {
 	const url = browser.runtime.getURL(`rules/${host}.json`)
