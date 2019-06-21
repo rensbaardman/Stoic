@@ -150,11 +150,10 @@ describe('popup', function() {
 			// fix to force wait for category elements to load
 			await driver.wait(until.elementLocated(By.css('li.category :first-child')));
 
-			const related_cat = await driver.findElement(By.css('#cat-related .category-name'))
+			const related_cat = await driver.findElement(By.css('#cat-related'))
 			await related_cat.click()
 
-			const related_cat_parent = await driver.findElement(By.css('#cat-related'))
-			const classes = await related_cat_parent.getAttribute('class')
+			const classes = await related_cat.getAttribute('class')
 
 			assert.include(classes, 'opened')
 
