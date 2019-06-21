@@ -52,7 +52,7 @@ function statusToggleHandler(host, event) {
 // We .bind() the host, label and cat_id later on,
 // so that it becomes an eventHandler.
 function categoryToggleHandler(host, label, cat_id, event) {
-	toggle(document.getElementById(`cat-${cat_id}`), 'active')
+	toggle(document.getElementById(`cat-${cat_id}`), 'disabled')
 	const input = label.parentElement.children[0]
 	const new_status = !input.checked;
 	setCategoryStatus(host, cat_id, new_status)

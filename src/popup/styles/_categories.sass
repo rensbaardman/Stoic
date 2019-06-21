@@ -31,19 +31,8 @@ li.category div.category-name h3
 	/* to push the checkbox to the right */
 	flex-grow: 1
 
-
 li.category.opened div.category-name
 	border-bottom: 1px solid gray
-
-
-// /* EXPERIMENT */
-// li.category div.category-name h3
-// 	color: gray
-
-// li.category.active div.category-name h3
-// 	color: black
-
-
 
 li.rule
 	cursor: initial
@@ -103,25 +92,25 @@ li.rule.override .toggle input[type=checkbox] + label:before
 
 // DISABLED
 
-.disabled header p span#status
+body.disabled header p span#status
 	font-weight: bold
 	color: gray
 
-.disabled .categories .toggle label:before
+body.disabled .categories .toggle label:before
 	background: lightgray
 
-.disabled .toggle input[type=checkbox]:checked + label::before
+body.disabled .toggle input[type=checkbox]:checked + label::before
 	background: lightgray
 
-.disabled .category-name h3
+body.disabled .category-name h3
 	color: lightgray
 
-.disabled li.rule
+body.disabled li.rule
 	color: lightgray
 
-.disabled li.category.overriden .override-indicator
+body.disabled li.category.overriden .override-indicator
 	border-color: lightgray
 
-.disabled li.rule.override .toggle input[type=checkbox] + label:before
+body.disabled li.rule.override .toggle input[type=checkbox] + label:before
 	background: lightgray
 

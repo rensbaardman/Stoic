@@ -42,12 +42,11 @@ async function assert_category_status(driver, cat_id, status) {
 	let input_status = await input.isSelected()
 
 	if (status === 'active') {
-		// TODO: this is the reverse compared to the body (e.g. add 'active' or add 'disabled') ---> pick one!
-		assert.include(classes, 'active')
+		assert.notInclude(classes, 'disabled')
 		assert.equal(input_status, true)
 	}
 	else if (status === 'disabled') {
-		assert.notInclude(classes, 'active')
+		assert.include(classes, 'disabled')
 		assert.equal(input_status, false)
 	}
 	else {
