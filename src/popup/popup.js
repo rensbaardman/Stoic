@@ -99,6 +99,11 @@ async function populatePopup(host) {
 	// Interestingly, the following adds a harmless empty
 	// <head></head> tag. See https://stackoverflow.com/questions/52888347/setting-document-body-outerhtml-creates-empty-heads-why
 	document.body.outerHTML = await generatePopup(host)
+	// Remove the empty <head> tag
+	// that was created on settings body.outerHTML
+	// (see https://stackoverflow.com/questions/52888347/setting-document-body-outerhtml-creates-empty-heads-why).
+	// document.children[0].children is [head, head, body]
+	document.children[0].children[1].remove()
 
 	addCategoryOpenHandlers()
 	addToggleHandlers(host)

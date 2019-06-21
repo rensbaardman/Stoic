@@ -159,6 +159,16 @@ describe('popup', function() {
 
 		})
 
+		it.only('has only on <head></head> element', async () => {
+
+			await driver.open_popup();
+			await driver.mock_url('https://www.example.com/');
+			const heads = await driver.findElements(By.css('head'))
+			const n_heads = heads.length
+			assert.equal(n_heads, 1)
+
+		})
+
 
 
 	})
