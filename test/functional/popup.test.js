@@ -261,6 +261,52 @@ describe('popup', function() {
 
 	})
 
+	describe('urls loads', () => {
+
+		it("does not repopulate the popup after a refresh", async () => {
+
+			await driver.open_popup();
+			await driver.mock_url('https://example.com')
+
+			// A bit hacky way to check the popup is not reloaded:
+			// if it would be reloaded, open categories would be closed.
+			related_cat = await driver.wait(until.elementLocated(By.css('#cat-related')))
+			// opens the category
+			await related_cat.click()
+
+			// refresh
+			await driver.mock_url('https://example.com')
+			const classes = await related_cat.getAttribute('class')
+			// should still be opened
+			assert.include(classes, 'opened')
+
+		})
+
+		it("does not repopulate the popup after url load with same host", async () => {
+
+			await driver.open_popup();
+			await driver.mock_url('https://example.com')
+
+			// A bit hacky way to check the popup is not reloaded:
+			// if it would be reloaded, open categories would be closed.
+			related_cat = await driver.wait(until.elementLocated(By.css('#cat-related')))
+			// opens the category
+			await related_cat.click()
+
+			// load url with same host
+			await driver.mock_url('https://example.com/some/child/url.html')
+			const classes = await related_cat.getAttribute('class')
+			// should still be opened
+			assert.include(classes, 'opened')
+
+		})
+
+		it.skip('does not repopulate the popup after url load in different window', () => {
+			assert.fail('how to test?')
+		})
+
+	})
+
 	describe('saving rule status', () => {})
 
 

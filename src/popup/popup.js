@@ -105,22 +105,11 @@ async function populatePopup(host) {
 }
 
 async function tabOnUpdatedListener(tabId, changeInfo, tab) {
-	// tabs.onUpdated fires many events,
-	// a lot of them are not relevant for us.
-	// this prevents the popup from being 're-populated'
-	// (refreshed) whenever new tab-info (e.g. favicon) is
-	// available.
-	//  TODO: test this behaviour? Either unit test or
-	// functional test? (last one is hard, first one is
-	// really tied to implementation...)
-	// TODO: also consider behaviour with multiple windows.
-	// Should probably only populate if in this current window
-	// (else url update in other window - which has its own active tab (?)
-	// - will change the url in this windows popup)
+	// Ensures popup will only be repopulated after true
+	// host change, not with either refresh or following link
+	// with same host or if new info (e.g. favicon) is available.
 
 	const activeHost = await getActiveHost();
-	// _currentHost is what we think the current host
-	// is, so if that's not correct: take action.
 	if (activeHost !== _currentHost) {
 		_currentHost = activeHost;
 		populatePopup(_currentHost)
