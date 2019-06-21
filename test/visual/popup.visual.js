@@ -6,8 +6,9 @@ async function main() {
 
 	await driver.open_popup();
 
+
 	await driver.mock_url('http://example.com')
-	await driver.saveScreenshot('popup example.com')
+	await driver.saveScreenshot('example.com')
 
 	let label = await driver.wait(until.elementLocated(By.css('label[for="toggle-status"]')));
 	// toggle to 'disabled'
@@ -21,7 +22,7 @@ async function main() {
 
 
 	await driver.mock_url('http://my-extremely-long-incredibly-loud-very-annoying-unbelievibly-close-fake-url.com')
-	await driver.saveScreenshot('popup long fake-url')
+	await driver.saveScreenshot('long fake-url')
 
 	await driver.quit()
 }

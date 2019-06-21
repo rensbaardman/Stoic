@@ -319,12 +319,33 @@ async function saveScreenshot(description) {
 	});
 
 	const browser_name = await this.get_browser_name();
-	if (description === undefined) {
-		const url = await this.getCurrentUrl();
-		description = url.split('/')[1]
+	let browser_abbr;
+	if (browser_name === 'firefox') {
+		browser_abbr = 'FF'
 	}
-	const safe_description = description.replace(' ', '_').replace(':', '-').replace('/', '-')
-	const filepath = `${filedir}/${package.version}-${browser_name}-${safe_description}.png`;
+	else if (browser_name === 'chrome') {
+		browser_abbr = 'GC'
+	}
+
+	const {extractHost} = require('../src/utils/url_utils.js')
+	const url = await this.getCurrentUrl();
+	let host;
+	if (url.startsWith('moz-extension://') || url.startsWith('chrome-extension://')) {
+		host = 'POP'
+	} else {
+		let host = extractHost(url)
+	}
+
+	const safe_description = description.replace(/[:\/\s]/g, '-')
+
+	let filename;
+	if (description === undefined) {
+		filename = `${browser_abbr}-${host}`
+	} else {
+		filename = `${browser_abbr}-${host}-${safe_description}`
+	}
+
+	const filepath = `${filedir}/${filename}.png`;
 
 	// returns a base-64 encoded PNG
 	let screenshot = await this.takeScreenshot()
