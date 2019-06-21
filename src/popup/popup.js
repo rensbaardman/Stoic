@@ -33,31 +33,29 @@ function addCategoryOpenHandlers() {
 	}
 }
 
-// TODO: refactor the following functions with
-// .bind(null, ..., ...)
-function generateStatusToggleHandler(host) {
-	return function(event) {
-		toggle(document.body, 'disabled');
+// We .bind() the host later on,
+// so that it becomes an eventHandler.
+function statusToggleHandler(host, event) {
+	toggle(document.body, 'disabled');
 
-		let status = document.getElementById('status');
-		if (status.innerText === 'active') {
-			status.innerText = 'disabled'
-			setHostStatus(host, false)
-		}
-		else {
-			status.innerText = 'active'
-			setHostStatus(host, true)
-		}
+	let status = document.getElementById('status');
+	if (status.innerText === 'active') {
+		status.innerText = 'disabled'
+		setHostStatus(host, false)
+	}
+	else {
+		status.innerText = 'active'
+		setHostStatus(host, true)
 	}
 }
 
-function generateCategoryToggleHandler(host, label, cat_id) {
-	return function(event) {
-		toggle(document.getElementById(`cat-${cat_id}`), 'active')
-		const input = label.parentElement.children[0]
-		const new_status = !input.checked;
-		setCategoryStatus(host, cat_id, new_status)
-	}
+// We .bind() the host, label and cat_id later on,
+// so that it becomes an eventHandler.
+function categoryToggleHandler(host, label, cat_id, event) {
+	toggle(document.getElementById(`cat-${cat_id}`), 'active')
+	const input = label.parentElement.children[0]
+	const new_status = !input.checked;
+	setCategoryStatus(host, cat_id, new_status)
 }
 
 function addToggleHandlers(host) {
@@ -68,7 +66,8 @@ function addToggleHandlers(host) {
 		const label_for = label.htmlFor.slice(7)
 
 		if (label_for === 'status') {
-			label.onclick = generateStatusToggleHandler(host)
+			// set 'this' to null, and then fix the host
+			label.onclick = statusToggleHandler.bind(null, host)
 		}
 		else if (label_for.startsWith('rule-')) {
 			const rule_id = label_for.slice(5)
@@ -76,7 +75,8 @@ function addToggleHandlers(host) {
 		}
 		else if (label_for.startsWith('cat-')){
 			const cat_id = label_for.slice(4)
-			label.onclick = generateCategoryToggleHandler(host, label, cat_id)
+			// set 'this' to null, and then fill in the other variables
+			label.onclick = categoryToggleHandler.bind(null, host, label, cat_id)
 		}
 		else {
 			throw new Error(`label_for is ${label_for}, expected either 'status', 'cat-*' or 'rule-*'`)

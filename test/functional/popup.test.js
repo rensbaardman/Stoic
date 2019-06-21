@@ -114,7 +114,6 @@ describe('popup', function() {
 
 			await driver.open_popup();
 			await driver.mock_url('https://www.example.com/yes/no.html');
-			console.log('url should have been mocked by now!')
 
 			// fix to force wait for category elements to load
 			await driver.wait(until.elementLocated(By.css('li.category :first-child')));
