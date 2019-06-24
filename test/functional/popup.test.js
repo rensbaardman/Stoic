@@ -271,6 +271,40 @@ describe('popup', function() {
 
 	})
 
+
+	describe('saving rule status', () => {
+
+		it.skip('changes rule status on toggle', async function() {
+			assert.fail('todo')
+		})
+
+		it.skip('saves the rule status', async function() {
+			assert.fail('todo')
+		})
+
+		it.skip("doesn't leak the rule state to other sites", async function() {
+			assert.fail('todo')
+		})
+
+		it.skip('correctly shows override status', async function() {
+			assert.fail('todo')
+		})
+
+		it.skip('has the ability to reset a rule to follow the parent category', async function() {
+			assert.fail('todo')
+		})
+
+		it.skip('correctly resets the rule to follow the parent category', async function() {
+			assert.fail('todo')
+		})
+
+		it.skip('correctly disables the override status after rule reset', async function() {
+			assert.fail('todo')
+		})
+
+	})
+
+
 	describe('page loads', () => {
 
 		it("does not repopulate the popup after a refresh", async () => {
@@ -316,9 +350,6 @@ describe('popup', function() {
 		})
 
 	})
-
-	describe('saving rule status', () => {})
-
 
 	describe('errors', () => {
 
