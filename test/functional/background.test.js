@@ -27,11 +27,18 @@ describe('background', function() {
 		await driver.quit()
 	})
 
-	describe('mic check 1, 2, 3', () => {
+	describe('initial load', () => {
 
-		it('jamming', async () => {
+		it('applies all css rules to the page, when no settings active', async () => {
 			await driver.get('http://earth.test:8080')
-			await driver.sleep(5000)
+
+			const logo = await driver.findElement(By.css('#logo'))
+			const display_status = await logo.isDisplayed()
+			assert.equal(display_status, false)
+
+			const related = await driver.findElement(By.css('#related'))
+			display_status = await related.isDisplayed()
+			assert.equal(display_status, false)
 		})
 
 	})

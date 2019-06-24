@@ -1,16 +1,18 @@
 {
-	"related": [
-		{
-			"desc": "hide mock 'related articles'",
-			"id": "hide-mock-related-articles",
-			"css": "a { display: none }"
-		}
-	],
 	"logo": [
 		{
 			"desc": "Hide Earth logo",
 			"id": "hide-logo",
 			"css":  "#logo { display: none }"
 		}
+	],
+
+	"related": [
+		{
+			"desc": "Hide 'related links'",
+			"id": "hide-related-links",
+			"css": "#related { display: none }"
+		}
 	]
+
 }
