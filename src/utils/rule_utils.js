@@ -8,6 +8,9 @@ async function getRules(host) {
 		response = await fetch(url);
 	}
 	catch (err) {
+		// TODO: when do these errors happen?
+		// I had it once when the file does not exist.
+		// But then returning {} is the right thing to do.
 		return {}
 	}
 	// the following is strange:

@@ -55,6 +55,18 @@ https://stackoverflow.com/questions/10541225/cross-browser-testing-all-major-bro
 
 makes a solid point: since Chrome and Firefox are updated automatically, browser share for outdated versions is very low
 
+# Modify hosts-file
+e.g. on Unix-y systems
+```
+	sudo nano /etc/hosts
+```
+and add
+```
+# test urls for Stoic
+localhost earth.test moon.test
+::1 earth.test moon.test
+```
+
 
 ## todo
 - check Greenkeeper or similar

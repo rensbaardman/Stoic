@@ -1,4 +1,4 @@
-const {setup_driver} = require('../selenium_utils.js');
+const {setup_driver} = require('../utils/selenium_utils.js');
 const {By, Key, until} = require('selenium-webdriver');
 
 async function main() {

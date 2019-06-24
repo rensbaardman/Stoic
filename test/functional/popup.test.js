@@ -1,6 +1,6 @@
 const {assert} = require('chai');
 const {By, until} = require('selenium-webdriver');
-const {setup_driver} = require('../selenium_utils.js')
+const {setup_driver} = require('../utils/selenium_utils.js')
 
 async function assert_in_popup(driver) {
 	const current_url = await driver.getCurrentUrl();
@@ -117,7 +117,7 @@ describe('popup', function() {
 		it("shows the categories of the current page", async () => {
 
 			await driver.open_popup();
-			await driver.mock_url('https://www.example.com/yes/no.html');
+			await driver.mock_url('https://www.earth.test/yes/no.html');
 
 			// fix to force wait for category elements to load
 			await driver.wait(until.elementLocated(By.css('li.category :first-child')));
@@ -132,7 +132,7 @@ describe('popup', function() {
 		it("attaches proper 'for' to the categories' labels", async () => {
 
 			await driver.open_popup();
-			await driver.mock_url('https://www.example.com/');
+			await driver.mock_url('https://www.earth.test/');
 
 			// fix to force wait for category elements to load
 			await driver.wait(until.elementLocated(By.css('li.category :first-child')));
@@ -145,7 +145,7 @@ describe('popup', function() {
 		it("clicking on a category opens it", async function() {
 
 			await driver.open_popup();
-			await driver.mock_url('https://www.example.com/');
+			await driver.mock_url('https://www.earth.test/');
 
 			// fix to force wait for category elements to load
 			await driver.wait(until.elementLocated(By.css('li.category :first-child')));
@@ -162,7 +162,7 @@ describe('popup', function() {
 		it('has only on <head></head> element', async () => {
 
 			await driver.open_popup();
-			await driver.mock_url('https://www.example.com/');
+			await driver.mock_url('https://www.earth.test/');
 			const heads = await driver.findElements(By.css('head'))
 			const n_heads = heads.length
 			assert.equal(n_heads, 1)
@@ -189,14 +189,14 @@ describe('popup', function() {
 		it('saves the popup status', async () => {
 
 			await driver.open_popup();
-			await driver.mock_url('https://example.com')
+			await driver.mock_url('https://earth.test')
 
 			let label = await driver.findElement(By.css('label[for="toggle-status"]'))
 			// toggle to 'disabled'
 			await label.click();
 
-			await driver.mock_url('https://some-other-url.com')
-			await driver.mock_url('https://example.com')
+			await driver.mock_url('https://moon.test')
+			await driver.mock_url('https://earth.test')
 
 			// should have saved the state after refresh
 			await assert_popup_status(driver, 'disabled')
@@ -206,15 +206,15 @@ describe('popup', function() {
 		it("doesn't leak the disabled state to other sites", async () => {
 
 			await driver.open_popup();
-			await driver.mock_url('https://example.com')
+			await driver.mock_url('https://earth.test')
 
 			let label = await driver.findElement(By.css('label[for="toggle-status"]'))
 			// toggle to 'disabled'
 			await label.click();
 
-			await driver.mock_url('https://some-other-url.com')
-			// setting example.com to disabled shouldn't have set
-			// some-other-url.com to disabled
+			await driver.mock_url('https://moon.test')
+			// setting earth.test to disabled shouldn't have set
+			// moon.test to disabled
 			await assert_popup_status(driver, 'active')
 
 		})
@@ -226,7 +226,7 @@ describe('popup', function() {
 		it('changes category status on toggle', async function() {
 
 			await driver.open_popup();
-			await driver.mock_url('https://example.com');
+			await driver.mock_url('https://earth.test');
 
 			let related_toggle = await driver.wait(until.elementLocated(By.css('label[for="toggle-cat-related"]')));
 			await related_toggle.click();
@@ -239,13 +239,13 @@ describe('popup', function() {
 		it('saves the category status', async function() {
 
 			await driver.open_popup();
-			await driver.mock_url('https://example.com');
+			await driver.mock_url('https://earth.test');
 
 			let related_toggle = await driver.wait(until.elementLocated(By.css('label[for="toggle-cat-related"]')));
 			await related_toggle.click();
 
-			await driver.mock_url('https://some-other-url.com')
-			await driver.mock_url('https://example.com')
+			await driver.mock_url('https://moon.test')
+			await driver.mock_url('https://earth.test')
 
 			// category 'related' should still be be disabled
 			await assert_category_status(driver, 'related', 'disabled')
@@ -256,14 +256,14 @@ describe('popup', function() {
 		it("doesn't leak the category state to other sites", async () => {
 
 			await driver.open_popup();
-			await driver.mock_url('https://example.com');
+			await driver.mock_url('https://earth.test');
 
 			let related_toggle = await driver.wait(until.elementLocated(By.css('label[for="toggle-cat-related"]')));
 			await related_toggle.click();
 
 			// we us mock-url since it _does_ have the category
 			// 'related' defined
-			await driver.mock_url('https://mock-url.space')
+			await driver.mock_url('https://moon.test')
 			// category 'related' should NOT be disabled
 			await assert_category_status(driver, 'related', 'active')
 
@@ -276,7 +276,7 @@ describe('popup', function() {
 		it("does not repopulate the popup after a refresh", async () => {
 
 			await driver.open_popup();
-			await driver.mock_url('https://example.com')
+			await driver.mock_url('https://earth.test')
 
 			// A bit hacky way to check the popup is not reloaded:
 			// if it would be reloaded, open categories would be closed.
@@ -285,7 +285,7 @@ describe('popup', function() {
 			await related_cat.click()
 
 			// refresh
-			await driver.mock_url('https://example.com')
+			await driver.mock_url('https://earth.test')
 			const classes = await related_cat.getAttribute('class')
 			// should still be opened
 			assert.include(classes, 'opened')
@@ -295,7 +295,7 @@ describe('popup', function() {
 		it("does not repopulate the popup after url load with same host", async () => {
 
 			await driver.open_popup();
-			await driver.mock_url('https://example.com')
+			await driver.mock_url('https://earth.test')
 
 			// A bit hacky way to check the popup is not reloaded:
 			// if it would be reloaded, open categories would be closed.
@@ -304,7 +304,7 @@ describe('popup', function() {
 			await related_cat.click()
 
 			// load url with same host
-			await driver.mock_url('https://example.com/some/child/url.html')
+			await driver.mock_url('https://earth.test/some/child/url.html')
 			const classes = await related_cat.getAttribute('class')
 			// should still be opened
 			assert.include(classes, 'opened')

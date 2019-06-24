@@ -6,7 +6,7 @@ const {Builder, By, until} = require('selenium-webdriver');
 const firefox = require('selenium-webdriver/firefox');
 const chrome = require('selenium-webdriver/chrome');
 
-const package = require('../package.json');
+const package = require('../../package.json');
 
 function file_to_buffer(path) {
 	let file = fs.readFileSync(path);

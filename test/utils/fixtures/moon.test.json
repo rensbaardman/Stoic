@@ -8,8 +8,15 @@
 	],
 	"logo": [
 		{
-			"desc": "hide logotitle",
-			"id": "hide-logotitle",
+			"desc": "Hide Moon logo",
+			"id": "hide-logo",
+			"css":  "#logo { display: none }"
+		}
+	],
+	"stats": [
+		{
+			"desc": "hide stats",
+			"id": "hide-mock-stats",
 			"css":  "h1 { display: none }"
 		}
 	]
