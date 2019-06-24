@@ -159,7 +159,7 @@ describe('popup', function() {
 
 		})
 
-		it.only('has only on <head></head> element', async () => {
+		it('has only on <head></head> element', async () => {
 
 			await driver.open_popup();
 			await driver.mock_url('https://www.example.com/');
@@ -271,7 +271,7 @@ describe('popup', function() {
 
 	})
 
-	describe('urls loads', () => {
+	describe('page loads', () => {
 
 		it("does not repopulate the popup after a refresh", async () => {
 
@@ -329,7 +329,7 @@ describe('popup', function() {
 		})
 
 		it.skip('can handle race conditions in saving [category / site / rule] status', () => {
-			assert.fail('does this ever happen? How to check for it? (very quickly sending two category changes and hoping they clash?')
+			assert.fail('does this ever happen? How to check for it? (very quickly sending two category changes and hoping they clash?)')
 		})
 	})
 

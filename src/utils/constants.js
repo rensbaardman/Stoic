@@ -1,7 +1,8 @@
 const CATEGORIES = {
 	'related': 'NO RELATED',
 	'social': 'NO SOCIAL',
-	'logo': "NO LOGO"
+	'logo': "NO LOGO",
+	'stats': "NO STATS"
 }
 
 module.exports = {
