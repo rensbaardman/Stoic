@@ -1,4 +1,4 @@
-const {getActiveHost, extractHost} = require('../utils/url_utils.js')
+const {getActiveHostname} = require('../utils/url_utils.js')
 const {getRules, constructCategories} = require('../utils/rule_utils.js')
 const {getHostStatus, setHostStatus, getCategorystatus, setCategoryStatus, getSettings} = require('../utils/storage_utils.js')
 const {generateBody, generateHeader, generateCategories, generateFooter} = require('./components.js')
@@ -114,7 +114,7 @@ async function tabOnUpdatedListener(tabId, changeInfo, tab) {
 	// host change, not with either refresh or following link
 	// with same host or if new info (e.g. favicon) is available.
 
-	const activeHost = await getActiveHost();
+	const activeHost = await getActiveHostname();
 	if (activeHost !== _currentHost) {
 		_currentHost = activeHost;
 		populatePopup(_currentHost)
@@ -124,7 +124,7 @@ browser.tabs.onUpdated.addListener(tabOnUpdatedListener);
 
 let _currentHost;
 async function main() {
-	_currentHost = await getActiveHost();
+	_currentHost = await getActiveHostname();
 	populatePopup(_currentHost)
 }
 

@@ -3,7 +3,7 @@ async function getActiveUrl() {
 	return tabs[0].url;
 }
 
-function extractHost(url) {
+function extractHostname(url) {
 	if (url.startsWith('about:')) {
 		return url
 	}
@@ -16,23 +16,23 @@ function extractHost(url) {
 		return url.split('/')[2]
 	}
 	else {
-		const host = new URL(url).host
-		if (host.startsWith('www.')) {
-			return host.slice(4)
+		const hostname = new URL(url).hostname
+		if (hostname.startsWith('www.')) {
+			return hostname.slice(4)
 		}
 		else {
-			return host;
+			return hostname;
 		}
 	}
 }
 
-async function getActiveHost() {
+async function getActiveHostname() {
 	const activeUrl = await getActiveUrl();
-	return extractHost(activeUrl);
+	return extractHostname(activeUrl);
 }
 
 module.exports = {
 	getActiveUrl: getActiveUrl,
-	getActiveHost: getActiveHost,
-	extractHost: extractHost
+	getActiveHostname: getActiveHostname,
+	extractHostname: extractHostname
 }

@@ -34,7 +34,7 @@ describe('url_utils', function() {
 
 	})
 
-	describe('extractHost', () => {
+	describe('extractHostname', () => {
 
 		it('should extract the host of an url', () => {
 			const test_urls = [
@@ -51,7 +51,8 @@ describe('url_utils', function() {
 				'http://localhost:8000',
 				'http://192.168.0.0:81', // we use :81, because else default ports (e.g. :80) are turned into empty url.host
 				'http://user:pass@host.com:8080/p/a/t/h?query=string#hash',
-				'moz-extension://0ef765d5-7fd6-3c44-8d06-91a08c25250e/popup/popup.html'
+				'moz-extension://0ef765d5-7fd6-3c44-8d06-91a08c25250e/popup/popup.html',
+				'http://example.org:8888/foo/bar#bang'
 			];
 			// TODO: consider more protocols / exceptions?
 			// about acct crid data file ftp geo gopher http https info ldap mailto nfs nntp sip / sips tag tel telnet urn view-source ws / wss xmpp
@@ -66,24 +67,25 @@ describe('url_utils', function() {
 				'about:blank',
 				'eiimnmioipafcokbfikbljfdeojpcgbh',
 				'settings',
-				'localhost:8000',
-				'192.168.0.0:81',
-				'host.com:8080',
-				'0ef765d5-7fd6-3c44-8d06-91a08c25250e'
+				'localhost',
+				'192.168.0.0',
+				'host.com',
+				'0ef765d5-7fd6-3c44-8d06-91a08c25250e',
+				'example.org'
 			]
-			const hosts = test_urls.map(url_utils.extractHost)
+			const hosts = test_urls.map(url_utils.extractHostname)
 			assert.deepEqual(hosts, expected_hosts)
 		})
 
-	describe('getActiveHost', function() {
+	describe('getActiveHostname', function() {
 
 		it('returns a Promise', function() {
-			let result = url_utils.getActiveHost();
+			let result = url_utils.getActiveHostname();
 			expect(result).to.be.an.instanceof(Promise);
 		})
 
 		it('returns the host of the active window', async function() {
-			let result = await url_utils.getActiveHost();
+			let result = await url_utils.getActiveHostname();
 			expect(result).to.equal('example.com')
 		})
 
