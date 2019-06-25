@@ -42,13 +42,14 @@ describe('background', function() {
 			assert.equal(display_status, false)
 		})
 
-		it('check the settings to determine which css rules to apply', async () => {
+		it('checks the settings to determine which css rules to apply', async () => {
 
 			const settings = {
 				"earth.test": {
 					_categories: {
 						related: false
-					}
+					},
+					"hide-stats": false
 				}
 			}
 
@@ -61,6 +62,34 @@ describe('background', function() {
 			let display_status = await logo.isDisplayed()
 			assert.equal(display_status, false)
 
+			const related = await driver.findElement(By.css('#related'))
+			display_status = await related.isDisplayed()
+			assert.equal(display_status, true)
+
+			const stats = await driver.findElement(By.css('#stats'))
+			display_status = await related.isDisplayed()
+			assert.equal(display_status, true)
+		})
+
+
+		it('handles setting changes via the popup', async () => {
+
+			await driver.get('http://earth.test:8080')
+
+			// switch to popup
+			const popup_url = await driver.get_popup_url();
+			await driver.open_in_new_tab(popup_url)
+			await driver.mock_url('http://earth.test:8080')
+
+			// deactive 'related' category
+			const related_label = driver.wait(until.elementLocated(By.css('label[for="toggle-cat-related"]')))
+			await related_label.click();
+
+			// switch back to page
+			const handles = await driver.getAllWindowHandles();
+			await driver.switchTo().window(handles[0])
+
+			// should be shown again
 			const related = await driver.findElement(By.css('#related'))
 			display_status = await related.isDisplayed()
 			assert.equal(display_status, true)

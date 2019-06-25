@@ -13,6 +13,13 @@
 			"id": "hide-related-links",
 			"css": "#related { display: none }"
 		}
-	]
+	],
 
+	"stats": [
+		{
+			"desc": "Hide 'Statistics'",
+			"id": "hide-statistics",
+			"css": "#stats { display: none }"
+		}
+	]
 }
