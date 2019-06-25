@@ -1,0 +1,42 @@
+const {getRules, constructCategories} = require('./utils/rule_utils.js')
+const {extractHostname} = require('./utils/url_utils.js')
+const {getHostStatus, setHostStatus, getCategorystatus, setCategoryStatus, getSettings} = require('./utils/storage_utils.js')
+const {applyCategory} = require('./utils/apply_utils.js')
+
+
+async function handleTab(tab) {
+	const host = extractHostname(tab.url);
+
+	// TODO: copied from popup.js - DRY?
+	const rulesFile = await getRules(host);
+	const settings = await getSettings(host);
+	const categories = constructCategories(rulesFile, settings);
+	const status = getHostStatus(settings);
+
+	if (status === true) {
+		categories.map(category => applyCategory(category, tab.id))
+	}
+}
+
+async function tabOnUpdatedListener(tabId, changeInfo, tab) {
+	// Multiple events are fired when url changes,
+	// only catch the on where we get the new url.
+	// TODO: there are events that happen earlier than this one
+	// - consider using those?
+	// TODO: check that this never fires if it shouldn't.
+	// TODO: check that Firefox and Chrome fire same / similar
+	// events.
+	if (typeof(changeInfo.url) !== 'undefined') {
+		handleTab(tab)
+	}
+}
+
+async function main() {
+	// can we assume that all urls are available on load?
+	const tabs = await browser.tabs.query({})
+
+	tabs.map(handleTab)
+}
+main()
+
+browser.tabs.onUpdated.addListener(tabOnUpdatedListener);

@@ -119,6 +119,15 @@ async function tabOnUpdatedListener(tabId, changeInfo, tab) {
 		_currentHost = activeHost;
 		populatePopup(_currentHost)
 	}
+
+	// TODO: this might in fact no work in Chrome,
+	// since it doesn't send tabOnUpdated events when
+	// switching between tabs...
+	// But: it is not possible (?) to leave the popup open
+	// in Chrome while switching tabs, so maybe it is not
+	// such a big problem.
+	// Else: do tabOnActivedListeners.
+	// Or: Chrome has browser.tabs.onActiveChanged
 }
 browser.tabs.onUpdated.addListener(tabOnUpdatedListener);
 

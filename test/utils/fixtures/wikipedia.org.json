@@ -1,0 +1,9 @@
+{
+	"logo": [
+		{
+			"id": "hide-logo",
+			"desc": "hide logo",
+			"css": ".central-textlogo-wrapper { display: none} "
+		}
+	]
+}

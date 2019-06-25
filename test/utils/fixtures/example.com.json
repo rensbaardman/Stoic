@@ -1,0 +1,18 @@
+{
+	"logo": [
+		{
+			"desc": "Hide 'Example domain'",
+			"id": "hide-logo",
+			"css":  "h1 { display: none }"
+		}
+	],
+
+	"related": [
+		{
+			"desc": "Hide 'More info'",
+			"id": "hide-more-info",
+			"css": "a { display: none }"
+		}
+	]
+
+}

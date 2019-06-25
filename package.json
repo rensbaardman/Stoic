@@ -44,7 +44,7 @@
 		"test:unit:watch": "npm run test:unit -- --watch",
 		"test:unit:browser": "karma start",
 		"test:unit:browser:watch": "npm run test:unit:browser -- --auto-watch --no-single-run",
-		"test:func": "npm-run-all test:func:*",
+		"test:func": "npm-run-all test:func:firefox test:func:chrome",
 		"test:func:background": "npm-run-all test:func:*:background",
 		"test:func:firefox": "npm-run-all build:firefox:test test:func:firefox:no-build",
 		"test:func:firefox:no-build": "SELENIUM_BROWSER=firefox mocha --recursive test/functional",

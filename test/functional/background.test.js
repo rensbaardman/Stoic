@@ -33,12 +33,16 @@ describe('background', function() {
 			await driver.get('http://earth.test:8080')
 
 			const logo = await driver.findElement(By.css('#logo'))
-			const display_status = await logo.isDisplayed()
+			let display_status = await logo.isDisplayed()
 			assert.equal(display_status, false)
 
 			const related = await driver.findElement(By.css('#related'))
 			display_status = await related.isDisplayed()
 			assert.equal(display_status, false)
+		})
+
+		it.skip('check the settings to determine which css rules to apply', async () => {
+			assert.fail('to finish')
 		})
 
 	})

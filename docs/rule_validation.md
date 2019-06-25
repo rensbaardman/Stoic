@@ -17,5 +17,8 @@ filename must be [valid host].json
 
 there should be an accompanying test file
 
+css rules should be unique (else they might be removed when a duplicate is removed)
+css rules of the form '<something> { display: none; }' should give a warning to move to 'hide' for clarity (also to prevent effectively a duplicate with css rule)
+
 maybe:
 - alfabetic order? (for categories? For rules?)

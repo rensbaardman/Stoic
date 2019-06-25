@@ -77,6 +77,8 @@ describe('url_utils', function() {
 			assert.deepEqual(hosts, expected_hosts)
 		})
 
+	})
+
 	describe('getActiveHostname', function() {
 
 		it('returns a Promise', function() {
@@ -88,8 +90,6 @@ describe('url_utils', function() {
 			let result = await url_utils.getActiveHostname();
 			expect(result).to.equal('example.com')
 		})
-
-	})
 
 	})
 

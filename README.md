@@ -81,3 +81,9 @@ localhost earth.test moon.test
     - did we request the correct permissions? (now there is no direct test for this!)
 the only way to proper test this is to do some kind of integration tests within the popup/extension-scope. But then there is still some awkward parallel testing. What if we forget to request the right permissions, and/or forget the integration tests for that? Or the reverse scenario (we drop a requirement, but still test for it).
 - make webpack ignore the WARNING with `const popup = require(popup_src_path);`
+- performance: checkout https://developer.chrome.com/extensions/background_migration and https://developer.chrome.com/extensions/performance. I still do not get what 'persistent' actually sets? See https://stackoverflow.com/questions/17632919/chrome-extension-execute-background-page-only-once-when-chrome-starts
+- check on which pages you can't use an extension
+	Note that content scripts are blocked on the following domains:
+	https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Content_scripts
+	also about:debugging etc: can't use insertCSS I think
+- consider using content scripts to inject / remove CSS, and they communicate with background, which checks for storage changes. This might make porting to Manifest v3 (with Serviceworkers) easier.
