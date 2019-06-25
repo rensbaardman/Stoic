@@ -1,4 +1,4 @@
-const {getRules, constructCategories} = require('./utils/rule_utils.js')
+const {getRules, getConfig} = require('./utils/rule_utils.js')
 const {extractHostname} = require('./utils/url_utils.js')
 const {getHostStatus, setHostStatus, getCategorystatus, setCategoryStatus, getSettings} = require('./utils/storage_utils.js')
 const {applyCategory} = require('./utils/apply_utils.js')
@@ -7,11 +7,7 @@ const {applyCategory} = require('./utils/apply_utils.js')
 async function handleTab(tab) {
 	const host = extractHostname(tab.url);
 
-	// TODO: copied from popup.js - DRY?
-	const rulesFile = await getRules(host);
-	const settings = await getSettings(host);
-	const categories = constructCategories(rulesFile, settings);
-	const status = getHostStatus(settings);
+	const {status, categories} = await getConfig(host)
 
 	if (status === true) {
 		categories.map(category => applyCategory(category, tab.id))

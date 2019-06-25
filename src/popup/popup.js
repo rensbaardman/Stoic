@@ -1,5 +1,5 @@
 const {getActiveHostname} = require('../utils/url_utils.js')
-const {getRules, constructCategories} = require('../utils/rule_utils.js')
+const {getRules, getConfig} = require('../utils/rule_utils.js')
 const {getHostStatus, setHostStatus, getCategorystatus, setCategoryStatus, getSettings} = require('../utils/storage_utils.js')
 const {generateBody, generateHeader, generateCategories, generateFooter} = require('./components.js')
 
@@ -82,10 +82,7 @@ function addToggleHandlers(host) {
 }
 
 async function generatePopup(host) {
-	const rulesFile = await getRules(host);
-	const settings = await getSettings(host);
-	const categories = constructCategories(rulesFile, settings);
-	const status = getHostStatus(settings);
+	const {status, categories} = await getConfig(host)
 
 	const header = generateHeader(host, status);
 	const main = generateCategories(categories);

@@ -1,4 +1,5 @@
 const {CATEGORIES} = require('./constants.js')
+const {getSettings, getHostStatus} = require('./storage_utils.js')
 
 async function getRules(host) {
 	const url = browser.runtime.getURL(`rules/${host}.json`)
@@ -89,9 +90,23 @@ function constructRule(rule, cat_status, status) {
 	return constructedRule
 }
 
+async function getConfig(host) {
+	const rulesFile = await getRules(host);
+	const settings = await getSettings(host);
+	const categories = constructCategories(rulesFile, settings);
+	const status = getHostStatus(settings);
+
+	const config =  {
+		categories: categories,
+		status: status
+	}
+	return config
+}
+
 module.exports = {
 	getRules: getRules,
 	constructCategories: constructCategories,
 	constructCategory: constructCategory,
-	constructRule: constructRule
+	constructRule: constructRule,
+	getConfig: getConfig
 }
