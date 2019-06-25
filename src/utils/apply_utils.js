@@ -43,6 +43,13 @@ async function applyCSS(css, tabId) {
 }
 
 function createStylesheet(tabId) {
+
+	// TODO: change structure so this gets called only once,
+	// to improve performance (e.g. call it in the background script,
+	// maybe even without checks to check if there are active css rules.
+	// Or do this in a content script? But then we have to check
+	// whether it has finished before applying CSS, anyway).
+
 	// Idempotent function: create the styleTag
 	// only if it did not exist yet.
 	// (note that we set _stoicStyleTag as global variable,

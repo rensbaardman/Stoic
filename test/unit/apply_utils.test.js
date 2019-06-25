@@ -145,36 +145,34 @@ describe('apply_utils', function() {
 
 		})
 
-		it.skip('checks if a "_stoic" style tag exists if browser.tabs.removeCSS is not available', () => {
 
-			assert.fail('finish')
-
-		})
-
-		it.skip('creates a "_stoic" style tag if it did not yet exist and browser.tabs.removeCSS is not available', () => {
-
-			assert.fail('finish')
-
-		})
-
-		it.skip('injects the css into the style tag if browser.tabs.removeCSS is not available', () => {
+		it('injects the css into the style tag if browser.tabs.removeCSS is not available',async () => {
 
 			const insertCSS_spy = sinon.spy()
 			browser_stub.tabs = {
-				insertCSS: insertCSS_spy, // removeCSS is undefined
-				executeScript: function() {}
+				insertCSS: insertCSS_spy // removeCSS is undefined
 			}
 
+			const createStylesheet_spy = sinon.stub()
+			createStylesheet_spy.resolves()
+			apply_utils.__set__('createStylesheet', createStylesheet_spy);
+
+			const addRuleToStylesheet_spy = sinon.spy()
+			apply_utils.__set__('addRuleToStylesheet', addRuleToStylesheet_spy);
+
 			const applyCSS = apply_utils.__get__('applyCSS');
-			applyCSS('my css', 1234)
+			await applyCSS('my css', 1234)
 
 			assert.notCalled(insertCSS_spy)
-			assert.fail('finish')
+			assert.called(createStylesheet_spy)
+			assert.called(addRuleToStylesheet_spy)
 
 		})
 
 
 	})
+
+	// NOTE: won't test createStylesheet() and addRuleToStylesheet() since that would be testing constants (too tightly coupled to 'src')
 
 	describe('removeCSS', () => {
 
