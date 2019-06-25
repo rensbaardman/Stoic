@@ -296,17 +296,26 @@ async function mock_url(url) {
 
 }
 
-async function reset_extension_storage() {
-	// we use the background url, on not the popup url,
-	// since this is cleaner (and popup might not be available in other)
-	// situations
+async function executeExtensionScript(script) {
+	// We use the background url, and not the popup url,
+	// since this is cleaner (and popup might not be available in other
+	// situations).
 	const background_url = this.get_background_page_url();
 	await this.open_in_new_tab(background_url);
 
-	const script = 'browser.storage.local.clear();'
 	await this.executeScript(script);
 
 	return this.safe_close_current_window();
+}
+
+async function setExtensionStorage(settings) {
+	const script = `browser.storage.local.set(${JSON.stringify(settings)});`
+	return this.executeExtensionScript(script)
+}
+
+async function reset_extension_storage() {
+	const script = 'browser.storage.local.clear();'
+	return this.executeExtensionScript(script)
 }
 
 async function saveScreenshot(description) {
@@ -382,6 +391,8 @@ class ExtendedBuilder extends Builder {
 		driver.safe_close_current_window = safe_close_current_window;
 		driver.safe_close_all_windows = safe_close_all_windows;
 		driver.mock_url = mock_url;
+		driver.executeExtensionScript = executeExtensionScript;
+		driver.setExtensionStorage = setExtensionStorage;
 		driver.reset_extension_storage = reset_extension_storage;
 		driver.saveScreenshot = saveScreenshot;
 		return driver;

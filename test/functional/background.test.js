@@ -31,6 +31,7 @@ describe('background', function() {
 
 		it('applies all css rules to the page, when no settings active', async () => {
 			await driver.get('http://earth.test:8080')
+			await driver.sleep(200) // allow background script to do its work
 
 			const logo = await driver.findElement(By.css('#logo'))
 			let display_status = await logo.isDisplayed()
@@ -41,8 +42,28 @@ describe('background', function() {
 			assert.equal(display_status, false)
 		})
 
-		it.skip('check the settings to determine which css rules to apply', async () => {
-			assert.fail('to finish')
+		it('check the settings to determine which css rules to apply', async () => {
+
+			const settings = {
+				"earth.test": {
+					_categories: {
+						related: false
+					}
+				}
+			}
+
+			await driver.setExtensionStorage(settings)
+
+			await driver.get('http://earth.test:8080')
+			await driver.sleep(200) // allow background script to do its work
+
+			const logo = await driver.findElement(By.css('#logo'))
+			let display_status = await logo.isDisplayed()
+			assert.equal(display_status, false)
+
+			const related = await driver.findElement(By.css('#related'))
+			display_status = await related.isDisplayed()
+			assert.equal(display_status, true)
 		})
 
 	})
