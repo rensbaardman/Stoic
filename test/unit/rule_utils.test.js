@@ -186,7 +186,7 @@ describe('rule_utils', function() {
 			]
 		})
 
-		it.skip('should add the categories in alfabetic / determined order (?!)', () => {
+		it.skip('should add the categories in alfabetic / predetermined order (?!)', () => {
 			assert.fail('determine whether we want this (and which option)')
 		})
 
@@ -233,12 +233,14 @@ describe('rule_utils', function() {
 						override: false,
 						desc: "hide logotitle",
 						id: "hide-logotitle",
+						css:  "h1 { display: none }",
 						active: true
 					},
 					{
 						override: false,
 						desc: "hide something else",
 						id: "hide-something-else",
+						css:  "h3 { display: none }",
 						active: true
 					}
 				]
@@ -288,6 +290,7 @@ describe('rule_utils', function() {
 					override: false,
 					desc: "hide logotitle",
 					id: "hide-logotitle",
+					css:  "h1 { display: none }",
 					active: false
 				}]
 			}
@@ -318,6 +321,7 @@ describe('rule_utils', function() {
 					override: true, // is override
 					desc: "hide logotitle",
 					id: "hide-logotitle",
+					css:  "h1 { display: none }",
 					active: true // should be true
 				}]
 			}
@@ -339,6 +343,7 @@ describe('rule_utils', function() {
 				override: false,
 				desc: "hide logotitle",
 				id: "hide-logotitle",
+				css:  "h1 { display: none }",
 				active: true
 			}
 			assert.deepEqual(rule_obj, expected_rule_obj)
@@ -355,6 +360,7 @@ describe('rule_utils', function() {
 				override: false,
 				desc: "hide logotitle",
 				id: "hide-logotitle",
+				css:  "h1 { display: none }",
 				active: false
 			}
 			assert.deepEqual(rule_obj, expected_rule_obj)
@@ -371,9 +377,42 @@ describe('rule_utils', function() {
 				override: true,
 				desc: "hide logotitle",
 				id: "hide-logotitle",
+				css:  "h1 { display: none }",
 				active: true
 			}
 			assert.deepEqual(rule_obj, expected_rule_obj)
+		})
+
+		it('preserves any keys that were set on the rule', () => {
+			const rule = {
+				"desc": "hide logotitle",
+				"id": "hide-logotitle",
+				"js":  "window.alert('ding dong')",
+				"something-else": "blabla",
+				"monty": "python"
+			}
+			const rule_obj = rule_utils.constructRule(rule, false, true) // now: category_status is false, but rule overrides it!
+			const expected_rule_obj = {
+				override: true,
+				desc: "hide logotitle",
+				id: "hide-logotitle",
+				"js":  "window.alert('ding dong')",
+				"something-else": "blabla",
+				"monty": "python",
+				active: true
+			}
+			assert.deepEqual(rule_obj, expected_rule_obj)
+		})
+
+		it("doesn't modify any the rule passed as argument", () => {
+			const rule = {
+				"desc": "hide logotitle",
+				"id": "hide-logotitle",
+				"css":  "h1 { display: none }"
+			}
+			const rule_copy = JSON.parse(JSON.stringify(rule))
+			const rule_obj = rule_utils.constructRule(rule, false, true) // now: category_status is false, but rule overrides it!
+			assert.deepEqual(rule, rule_copy)
 		})
 
 	})

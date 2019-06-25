@@ -3,7 +3,7 @@ const {CATEGORIES} = require('./constants.js')
 async function getRules(host) {
 	const url = browser.runtime.getURL(`rules/${host}.json`)
 	// object of type Response (even if request is unsuccesfull?)
-	let reponse;
+	let response;
 	try {
 		response = await fetch(url);
 	}
@@ -71,24 +71,22 @@ function constructCategory(id, rules, settings) {
 }
 
 function constructRule(rule, cat_status, status) {
+	// make a copy of the rule
+	let constructedRule = JSON.parse(JSON.stringify(rule))
+
 	if (status === undefined) {
 		status = cat_status
 	}
+	constructedRule.active = status;
 
-	let override;
 	if (status === cat_status) {
-		override = false;
+		constructedRule.override = false;
 	}
 	else {
-		override = true;
+		constructedRule.override = true;
 	}
 
-	return {
-		override: override,
-		desc: rule.desc,
-		id: rule.id,
-		active: status
-	}
+	return constructedRule
 }
 
 module.exports = {
