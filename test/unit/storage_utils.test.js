@@ -219,5 +219,4 @@ describe('storage_utils', function() {
 
 	})
 
-
 })
