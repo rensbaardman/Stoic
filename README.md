@@ -87,3 +87,4 @@ the only way to proper test this is to do some kind of integration tests within 
 	https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Content_scripts
 	also about:debugging etc: can't use insertCSS I think
 - consider using content scripts to inject / remove CSS, and they communicate with background, which checks for storage changes. This might make porting to Manifest v3 (with Serviceworkers) easier.
+- consider using ES6 modules in the browser (saves webpack compiling). But would rewire() still work?
