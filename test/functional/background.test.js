@@ -3,6 +3,12 @@ const {setup_driver} = require('../utils/selenium_utils.js');
 const {createTestServer} = require('../utils/server_utils.js')
 const {assert} = require('chai');
 
+async function assertDisplayStatus(driver, selector, status) {
+	const el = await driver.findElement(By.css(selector))
+	let display_status = await el.isDisplayed()
+	assert.equal(display_status, status, `${selector}-element should ${status ? '' : 'NOT '}be displayed`)
+}
+
 
 describe('background', function() {
 
@@ -33,16 +39,31 @@ describe('background', function() {
 			await driver.get('http://earth.test:8080')
 			await driver.sleep(200) // allow background script to do its work
 
-			const logo = await driver.findElement(By.css('#logo'))
-			let display_status = await logo.isDisplayed()
-			assert.equal(display_status, false)
-
-			const related = await driver.findElement(By.css('#related'))
-			display_status = await related.isDisplayed()
-			assert.equal(display_status, false)
+			await assertDisplayStatus(driver, '#logo', false)
+			await assertDisplayStatus(driver, '#related', false)
+			await assertDisplayStatus(driver, '#stats', false)
 		})
 
-		it('checks the settings to determine which css rules to apply', async () => {
+
+		it('checks the _status settings to determine whether to apply anything', async () => {
+
+			const settings = {
+				"earth.test": {
+					_status: false
+				}
+			}
+
+			await driver.setExtensionStorage(settings)
+
+			await driver.get('http://earth.test:8080')
+			await driver.sleep(200) // allow background script to do its work
+
+			await assertDisplayStatus(driver, '#logo', true)
+			await assertDisplayStatus(driver, '#related', true)
+			await assertDisplayStatus(driver, '#stats', true)
+		})
+
+		it('checks the category and rule settings to determine which rules to apply', async () => {
 
 			const settings = {
 				"earth.test": {
@@ -58,41 +79,249 @@ describe('background', function() {
 			await driver.get('http://earth.test:8080')
 			await driver.sleep(200) // allow background script to do its work
 
-			const logo = await driver.findElement(By.css('#logo'))
-			let display_status = await logo.isDisplayed()
-			assert.equal(display_status, false)
-
-			const related = await driver.findElement(By.css('#related'))
-			display_status = await related.isDisplayed()
-			assert.equal(display_status, true)
-
-			const stats = await driver.findElement(By.css('#stats'))
-			display_status = await related.isDisplayed()
-			assert.equal(display_status, true)
+			await assertDisplayStatus(driver, '#logo', false)
+			await assertDisplayStatus(driver, '#related', true)
+			await assertDisplayStatus(driver, '#stats', true)
 		})
 
 
-		it('handles setting changes via the popup', async () => {
+	})
+
+	describe('storage settings changes', () => {
+
+		it('handles status setting changes', async () => {
 
 			await driver.get('http://earth.test:8080')
 
-			// switch to popup
-			const popup_url = await driver.get_popup_url();
-			await driver.open_in_new_tab(popup_url)
-			await driver.mock_url('http://earth.test:8080')
+			let settings = {
+				"earth.test": {
+					_status: false
+				}
+			}
+			await driver.setExtensionStorage(settings)
+			await driver.sleep(200) // allow background script to do its work
 
-			// deactive 'related' category
-			const related_label = driver.wait(until.elementLocated(By.css('label[for="toggle-cat-related"]')))
-			await related_label.click();
+			// nothing should be hidden
+			await assertDisplayStatus(driver, '#logo', true)
+			await assertDisplayStatus(driver, '#related', true)
+			await assertDisplayStatus(driver, '#stats', true)
 
-			// switch back to page
-			const handles = await driver.getAllWindowHandles();
-			await driver.switchTo().window(handles[0])
+			settings = {
+				"earth.test": {
+					_status: false
+				}
+			}
+			await driver.setExtensionStorage(settings)
+			await driver.sleep(200) // allow background script to do its work
 
-			// should be shown again
-			const related = await driver.findElement(By.css('#related'))
-			display_status = await related.isDisplayed()
-			assert.equal(display_status, true)
+			// rules should be enabled again
+			await assertDisplayStatus(driver, '#logo', false)
+			await assertDisplayStatus(driver, '#related', false)
+			await assertDisplayStatus(driver, '#stats', false)
+
+			// RESET
+			settings = {
+				"earth.test": { }
+			}
+			await driver.setExtensionStorage(settings)
+			await driver.sleep(200) // allow background script to do its work
+
+			// rules should be enabled still
+			// (this implicitly assumes that if no status is set, it should be active.
+			// See defaults.js)
+			await assertDisplayStatus(driver, '#logo', false)
+			await assertDisplayStatus(driver, '#related', false)
+			await assertDisplayStatus(driver, '#stats', false)
+
+		})
+
+		it('handles category setting changes', async () => {
+
+			await driver.get('http://earth.test:8080')
+
+			let settings = {
+				"earth.test": {
+					_categories: {
+						related: false
+					}
+				}
+			}
+			await driver.setExtensionStorage(settings)
+			await driver.sleep(200) // allow background script to do its work
+
+			// related rule should be disabled, so element shown
+			await assertDisplayStatus(driver, '#logo', false)
+			await assertDisplayStatus(driver, '#related', true)
+			await assertDisplayStatus(driver, '#stats', false)
+
+			settings = {
+				"earth.test": {
+					_categories: {
+						related: true
+					}
+				}
+			}
+			await driver.setExtensionStorage(settings)
+			await driver.sleep(200) // allow background script to do its work
+
+			// rule should be enabled again
+			await assertDisplayStatus(driver, '#logo', false)
+			await assertDisplayStatus(driver, '#related', false)
+			await assertDisplayStatus(driver, '#stats', false)
+
+			// RESET
+			settings = {
+				"earth.test": { }
+			}
+			await driver.setExtensionStorage(settings)
+			await driver.sleep(200) // allow background script to do its work
+
+			// rules should be enabled still
+			// (this implicitly assumes that if no cat status is set, it should be active)
+			await assertDisplayStatus(driver, '#logo', false)
+			await assertDisplayStatus(driver, '#related', false)
+			await assertDisplayStatus(driver, '#stats', false)
+
+		})
+
+		it('handles rule setting changes', async () => {
+
+			await driver.get('http://earth.test:8080')
+
+			let settings = {
+				"earth.test": {
+					'hide-logo': false
+				}
+			}
+			await driver.setExtensionStorage(settings)
+			await driver.sleep(200) // allow background script to do its work
+
+			// rule should be disabled, so logo shown
+			await assertDisplayStatus(driver, '#logo', true)
+			await assertDisplayStatus(driver, '#related', false)
+			await assertDisplayStatus(driver, '#stats', false)
+
+			settings = {
+				"earth.test": {
+					'hide-logo': true
+				}
+			}
+			await driver.setExtensionStorage(settings)
+			await driver.sleep(200) // allow background script to do its work
+
+			// rule should be enabled again
+			await assertDisplayStatus(driver, '#logo', false)
+			await assertDisplayStatus(driver, '#related', false)
+			await assertDisplayStatus(driver, '#stats', false)
+
+			// RESET
+			settings = {
+				"earth.test": { }
+			}
+			await driver.setExtensionStorage(settings)
+			await driver.sleep(200) // allow background script to do its work
+
+			// rules should be enabled still
+			// (this implicitly assumes that if no rule status is set, it should be active)
+			await assertDisplayStatus(driver, '#logo', false)
+			await assertDisplayStatus(driver, '#related', false)
+			await assertDisplayStatus(driver, '#stats', false)
+
+		})
+
+		it('handles cat changes depending on _status', async () => {
+
+			await driver.get('http://earth.test:8080')
+
+			let settings = {
+				"earth.test": {
+					_status: false
+				}
+			}
+			await driver.setExtensionStorage(settings)
+			await driver.sleep(200) // allow background script to do its work
+
+			settings = {
+				"earth.test": {
+					_status: false,
+					_categories: {
+						related: true
+					}
+				}
+			}
+			await driver.setExtensionStorage(settings)
+			await driver.sleep(200) // allow background script to do its work
+
+			// Even though related category has been enabled again,
+			// this should not change anything since site status is disabled
+			// (so all elements should be shown)
+			await assertDisplayStatus(driver, '#logo', true)
+			await assertDisplayStatus(driver, '#related', true)
+			await assertDisplayStatus(driver, '#stats', true)
+
+		})
+
+		it('handles rule changes depending on _status', async () => {
+
+			await driver.get('http://earth.test:8080')
+
+			let settings = {
+				"earth.test": {
+					_status: false
+				}
+			}
+			await driver.setExtensionStorage(settings)
+			await driver.sleep(200) // allow background script to do its work
+
+			settings = {
+				"earth.test": {
+					_status: false,
+					'hide-logo': true
+				}
+			}
+			await driver.setExtensionStorage(settings)
+			await driver.sleep(200) // allow background script to do its work
+
+			// Even though 'hide-logo' has been enabled again,
+			// this should not change anything since site status is disabled
+			// (so all elements should be shown)
+			await assertDisplayStatus(driver, '#logo', true)
+			await assertDisplayStatus(driver, '#related', true)
+			await assertDisplayStatus(driver, '#stats', true)
+
+		})
+
+		it('handles rule changes depending on cat status', async () => {
+
+			await driver.get('http://earth.test:8080')
+
+			let settings = {
+				"earth.test": {
+					_categories: {
+						related: false
+					}
+				}
+			}
+			await driver.setExtensionStorage(settings)
+			await driver.sleep(200) // allow background script to do its work
+
+			settings = {
+				"earth.test": {
+					_categories: {
+						related: false
+					},
+					'hide-related-links': true
+				}
+			}
+			await driver.setExtensionStorage(settings)
+			await driver.sleep(200) // allow background script to do its work
+
+			// Even though 'hide-logo' has been enabled again,
+			// this should not change anything since cat status is disabled
+			// (so all elements should be shown)
+			await assertDisplayStatus(driver, '#logo', true)
+			await assertDisplayStatus(driver, '#related', true)
+			await assertDisplayStatus(driver, '#stats', true)
 		})
 
 	})

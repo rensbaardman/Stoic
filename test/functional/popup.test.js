@@ -124,7 +124,7 @@ describe('popup', function() {
 
 			let category_titles = await driver.findElements(By.css('li.category h3'))
 			let category_texts = await Promise.all(category_titles.map((el) => el.getText()))
-			const expected_categories = ['NO RELATED', 'NO LOGO']
+			const expected_categories = ['NO RELATED', 'NO LOGO', 'NO STATS']
 			assert.deepEqual(category_texts.sort(), expected_categories.sort())
 
 		})
@@ -203,6 +203,40 @@ describe('popup', function() {
 
 		})
 
+		it('saves the popup status in storage', async () => {
+
+			await driver.open_popup();
+			await driver.mock_url('https://earth.test')
+
+			let label = await driver.findElement(By.css('label[for="toggle-status"]'))
+			// toggle to 'disabled'
+			await label.click();
+
+			const settings = await driver.getExtensionStorage();
+
+			const expected_settings = {
+				'earth.test': {
+					_status: false
+				}
+			}
+
+			assert.deepEqual(settings, expected_settings)
+
+			// and ENABLE again
+
+			label = await driver.findElement(By.css('label[for="toggle-status"]'))
+			// toggle to 'enabled'
+			await label.click();
+
+			expected_settings = {
+				'earth.test': {
+					_status: true
+				}
+			}
+			assert.deepEqual(settings, expected_settings)
+
+		})
+
 		it("doesn't leak the disabled state to other sites", async () => {
 
 			await driver.open_popup();
@@ -253,6 +287,44 @@ describe('popup', function() {
 		})
 
 
+		it('saves the category status in storage', async () => {
+
+			await driver.open_popup();
+			await driver.mock_url('https://earth.test')
+
+			let label = await driver.findElement(By.css('label[for="toggle-cat-related"]'))
+			// toggle to 'disabled'
+			await label.click();
+
+			const settings = await driver.getExtensionStorage();
+
+			const expected_settings = {
+				'earth.test': {
+					_categories: {
+						related: false
+					}
+				}
+			}
+
+			assert.deepEqual(settings, expected_settings)
+
+			// and ENABLE again
+
+			label = await driver.findElement(By.css('label[for="toggle-cat-related"]'))
+			// toggle to 'enabled'
+			await label.click();
+
+			expected_settings = {
+				'earth.test': {
+					_categories: {
+						related: true
+					}
+				}
+			}
+			assert.deepEqual(settings, expected_settings)
+
+		})
+
 		it("doesn't leak the category state to other sites", async () => {
 
 			await driver.open_popup();
@@ -282,6 +354,50 @@ describe('popup', function() {
 			assert.fail('todo')
 		})
 
+
+		it.skip('saves the rule status in storage', async () => {
+
+			await driver.open_popup();
+			await driver.mock_url('https://earth.test')
+
+			// category needs to be open to be able to click on the rule label
+			// (else the label is not visible)
+			let cat = await driver.findElement(By.css('#cat-related'))
+			await cat.click()
+
+			let label = await driver.findElement(By.css('label[for="toggle-rule-hide-related-links"]'))
+			// toggle to 'disabled'
+			await label.click();
+
+			const settings = await driver.getExtensionStorage();
+
+			const expected_settings = {
+				'earth.test': {
+					'hide-related-links': false
+				}
+			}
+
+			assert.deepEqual(settings, expected_settings)
+
+			// and ENABLE again
+
+			// open again
+			cat = await driver.findElement(By.css('#cat-related'))
+			await cat.click()
+
+			label = await driver.findElement(By.css('label[for="toggle-rule-hide-related-links"]'))
+			// toggle to 'enabled'
+			await label.click();
+
+			expected_settings = {
+				'earth.test': {
+					'hide-related-links': true
+				}
+			}
+			assert.deepEqual(settings, expected_settings)
+
+		})
+
 		it.skip("doesn't leak the rule state to other sites", async function() {
 			assert.fail('todo')
 		})
@@ -300,6 +416,81 @@ describe('popup', function() {
 
 		it.skip('correctly disables the override status after rule reset', async function() {
 			assert.fail('todo')
+		})
+
+	})
+
+
+	describe('storage', () => {
+
+		it.skip("doesn't override previous values when setting new values", async () => {
+
+			await driver.open_popup();
+			await driver.mock_url('https://earth.test')
+
+			let label = await driver.findElement(By.css('label[for="toggle-status"]'))
+			// toggle to 'disabled'
+			await label.click();
+
+			label = await driver.findElement(By.css('label[for="toggle-cat-related"]'))
+			// toggle to 'disabled'
+			await label.click();
+
+			// category needs to be open to be able to click on the rule label
+			// (else the label is not visible)
+			let cat = await driver.findElement(By.css('#cat-related'))
+			await cat.click()
+
+			label = await driver.findElement(By.css('label[for="toggle-rule-hide-related-links"]'))
+			// toggle to 'disabled'
+			await label.click();
+
+			label = await driver.findElement(By.css('label[for="toggle-cat-logo"]'))
+			// toggle to 'disabled'
+			await label.click();
+
+			label = await driver.findElement(By.css('label[for="toggle-cat-related"]'))
+			// toggle to 'ENABLED' again
+			await label.click();
+
+			label = await driver.findElement(By.css('label[for="toggle-rule-hide-related-links"]'))
+			// toggle to 'ENABLED' again
+			await label.click();
+
+			// category needs to be open to be able to click on the rule label
+			// (else the label is not visible)
+			cat = await driver.findElement(By.css('#cat-stats'))
+			await cat.click()
+
+			label = await driver.findElement(By.css('label[for="toggle-rule-hide-statistics"]'))
+			// toggle to 'disabled'
+			await label.click();
+
+			label = await driver.findElement(By.css('label[for="toggle-status"]'))
+			// toggle to 'enabled' again
+			await label.click();
+
+			label = await driver.findElement(By.css('label[for="toggle-rule-hide-related-links"]'))
+			// toggle to 'enabled' again
+			await label.click();
+
+			const settings = await driver.getExtensionStorage();
+
+			const expected_settings = {
+				'earth.test': {
+					_status: true,
+					_categories: {
+						related: true,
+						logo: false
+					},
+					'hide-related-links': true,
+					'hide-statistics': false
+				}
+			}
+
+			// should have saved the state after refresh
+			assert.deepEqual(settings, expected_settings)
+
 		})
 
 	})
