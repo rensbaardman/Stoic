@@ -42,6 +42,7 @@ async function applyCSS(css, tabId) {
 
 }
 
+/* istanbul ignore next : we don't test constants */
 function createStylesheet(tabId) {
 
 	// TODO: change structure so this gets called only once,
@@ -73,6 +74,7 @@ function createStylesheet(tabId) {
 	return browser.tabs.executeScript(tabId, {code: src})
 }
 
+/* istanbul ignore next : we don't test constants */
 function addRuleToStylesheet(css, tabId) {
 	const src =
 `if (typeof(_stoicStyleSheet) === 'undefined') {
@@ -84,6 +86,7 @@ undefined`
 }
 
 function removeCSS(css, tabId) { }
+/* istanbul ignore next : we don't test constants */
 
 
 function applyHide(selector, tabId) {}
