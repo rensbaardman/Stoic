@@ -214,7 +214,7 @@ describe('popup', function() {
 
 			const settings = await driver.getExtensionStorage();
 
-			const expected_settings = {
+			let expected_settings = {
 				'earth.test': {
 					_status: false
 				}
@@ -298,7 +298,7 @@ describe('popup', function() {
 
 			const settings = await driver.getExtensionStorage();
 
-			const expected_settings = {
+			let expected_settings = {
 				'earth.test': {
 					_categories: {
 						related: false
