@@ -144,6 +144,10 @@ describe('background', function() {
 			await assertDisplayStatus(driver, '#stats', false)
 		})
 
+		it.skip('should show the categories in a predetermined order, irrespective of order in .json', () => {
+			assert.fail('consider this. Which order then? Alphabetic?')
+		})
+
 	})
 
 	describe('storage settings changes', () => {
