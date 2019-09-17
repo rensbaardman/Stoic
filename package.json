@@ -74,7 +74,7 @@
 		"build:chrome": "webpack --env chrome --display-modules",
 		"build:chrome:test": "WEBPACK_TEST='true' npm run build:chrome",
 		"debug": "npm-run-all build:firefox:test debug:no-build",
-		"debug:no-build": "web-ext run -s build/Stoic-0.1.0-firefox -u about:debugging example.com",
+		"debug:no-build": "web-ext run --source-dir build/Stoic-0.1.0-firefox --start-url about:debugging --start-url example.com",
 		"debug:watch": "npm-run-all --parallel build:firefox:watch debug:no-build"
 	},
 	"private": true
