@@ -2,6 +2,7 @@
 	"name": "Stoic",
 	"version": "0.1.0",
 	"dependencies": {
+		"deep-object-diff": "^1.1.0",
 		"normalize.css": "^8.0.1",
 		"webextension-polyfill": "^0.4.0"
 	},

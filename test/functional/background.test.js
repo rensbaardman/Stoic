@@ -63,14 +63,52 @@ describe('background', function() {
 			await assertDisplayStatus(driver, '#stats', true)
 		})
 
-		it('checks the category and rule settings to determine which rules to apply', async () => {
+		it('checks the category settings to determine which rules to apply', async () => {
+
+			const settings = {
+				"earth.test": {
+					_categories: {
+						related: false
+					}
+				}
+			}
+
+			await driver.setExtensionStorage(settings)
+
+			await driver.get('http://earth.test:8080')
+			await driver.sleep(200) // allow background script to do its work
+
+			await assertDisplayStatus(driver, '#logo', false)
+			await assertDisplayStatus(driver, '#related', true)
+			await assertDisplayStatus(driver, '#stats', false)
+		})
+
+		it('checks the rule settings to determine which rules to apply', async () => {
+
+			const settings = {
+				"earth.test": {
+					"hide-statistics": false
+				}
+			}
+
+			await driver.setExtensionStorage(settings)
+
+			await driver.get('http://earth.test:8080')
+			await driver.sleep(200) // allow background script to do its work
+
+			await assertDisplayStatus(driver, '#logo', false)
+			await assertDisplayStatus(driver, '#related', false)
+			await assertDisplayStatus(driver, '#stats', true)
+		})
+
+		it('can handle category and rule settings at the same time', async () => {
 
 			const settings = {
 				"earth.test": {
 					_categories: {
 						related: false
 					},
-					"hide-stats": false
+					"hide-statistics": false
 				}
 			}
 
@@ -84,6 +122,27 @@ describe('background', function() {
 			await assertDisplayStatus(driver, '#stats', true)
 		})
 
+		it('can handle conflicting category and rule settings', async () => {
+
+			const settings = {
+				"earth.test": {
+					_categories: {
+						related: false
+					},
+					"hide-related-links": true
+				}
+			}
+
+			await driver.setExtensionStorage(settings)
+
+			await driver.get('http://earth.test:8080')
+			await driver.sleep(200) // allow background script to do its work
+			// await driver.sleep(2000000)
+
+			await assertDisplayStatus(driver, '#logo', false)
+			await assertDisplayStatus(driver, '#related', false)
+			await assertDisplayStatus(driver, '#stats', false)
+		})
 
 	})
 

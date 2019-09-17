@@ -131,7 +131,7 @@ describe('rule_utils', function() {
 					id: 'logo',
 					name: "NO LOGO",
 					active: true,
-					overriden: true,
+					overridden: true,
 					opened: false,
 
 					rules: [{
@@ -145,7 +145,7 @@ describe('rule_utils', function() {
 					id: 'social',
 					name: "NO SOCIAL",
 					active: false,
-					overriden: false,
+					overridden: false,
 					opened: false,
 
 					rules: [{
@@ -159,7 +159,7 @@ describe('rule_utils', function() {
 					id: 'related',
 					name: "NO RELATED",
 					active: false,
-					overriden: false,
+					overridden: false,
 					opened: false,
 
 					rules: [{
@@ -173,7 +173,7 @@ describe('rule_utils', function() {
 					id: 'stats',
 					name: "NO STATS",
 					active: true,
-					overriden: true,
+					overridden: true,
 					opened: false,
 
 					rules: [{
@@ -201,7 +201,7 @@ describe('rule_utils', function() {
 			const category = rule_utils.constructCategory('social', [], {'_categories': {}});
 			const expected_category = {
 				active: true,
-				overriden: false,
+				overridden: false,
 				opened: false,
 				id: 'social',
 				name: "NO SOCIAL",
@@ -224,7 +224,7 @@ describe('rule_utils', function() {
 			const category = rule_utils.constructCategory('social', [rule1, rule2], {'_categories': {}});
 			const expected_category = {
 				active: true,
-				overriden: false,
+				overridden: false,
 				opened: false,
 				id: 'social',
 				name: "NO SOCIAL",
@@ -258,7 +258,7 @@ describe('rule_utils', function() {
 			const categories = rule_utils.constructCategory('related', [], settings)
 			const expected_category = {
 				active: false,
-				overriden: false,
+				overridden: false,
 				opened: false,
 				id: 'related',
 				name: "NO RELATED",
@@ -282,7 +282,7 @@ describe('rule_utils', function() {
 			const categories = rule_utils.constructCategory('logo', rules, settings)
 			const expected_category = {
 				active: false,
-				overriden: false,
+				overridden: false,
 				opened: false,
 				id: 'logo',
 				name: "NO LOGO",
@@ -313,7 +313,7 @@ describe('rule_utils', function() {
 			const categories = rule_utils.constructCategory('logo', rules, settings)
 			const expected_category = {
 				active: false,
-				overriden: true, // overriden
+				overridden: true, // overridden
 				opened: false,
 				id: 'logo',
 				name: "NO LOGO",
@@ -413,6 +413,35 @@ describe('rule_utils', function() {
 			const rule_copy = JSON.parse(JSON.stringify(rule))
 			const rule_obj = rule_utils.constructRule(rule, false, true) // now: category_status is false, but rule overrides it!
 			assert.deepEqual(rule, rule_copy)
+		})
+
+	})
+
+	describe('getConfig', () => {
+
+		// TODO: since this doesn't mock constructCategories and getHostStatus,
+		// it's INTEGRATION - try to decouple
+		it('Can handle empty rule file and no settings', async () => {
+
+			getRulesMock = sinon.stub().resolves({})
+			rule_utils.__set__('getRules', getRulesMock)
+
+			getSettingsMock = sinon.stub().resolves({'_categories': {}})
+			rule_utils.__set__('getSettings', getSettingsMock)
+
+			config = await rule_utils.getConfig('earth.test')
+
+			expectedConfig = { categories: [], status: true }
+			assert.deepEqual(config, expectedConfig)
+
+		})
+
+		it.skip('consider other cases', () => {
+			// other cases:
+			// - if settings is given (prefetched somehow)
+			// - what if there are settings but no rules for a host?
+			// - more complex cases (depend mainly on constructCategories though)
+			assert.fail()
 		})
 
 	})

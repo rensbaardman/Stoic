@@ -1,6 +1,6 @@
 {
 	active: true / false,
-	overriden: true / false,
+	overridden: true / false,
 	opened: true / false,
 	cat_id: <string>
 	name: <string>,

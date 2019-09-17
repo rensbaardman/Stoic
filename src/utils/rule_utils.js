@@ -47,14 +47,14 @@ function constructCategory(id, rules, settings) {
 		cat_status = true
 	}
 
-	let overriden = false;
+	let overridden = false;
 	let constructedRules = []
 	for (let rule of rules) {
 		// this might be undefined, but that works too
 		let rule_status = settings[rule.id];
 
 		if (rule_status !== undefined && rule_status !== cat_status) {
-			overriden = true;
+			overridden = true;
 		}
 
 		const rule_obj = constructRule(rule, cat_status, rule_status)
@@ -63,7 +63,7 @@ function constructCategory(id, rules, settings) {
 
 	return {
 		active: cat_status,
-		overriden: overriden,
+		overridden: overridden,
 		opened: false,
 		id: id,
 		name: CATEGORIES[id],
@@ -90,9 +90,13 @@ function constructRule(rule, cat_status, status) {
 	return constructedRule
 }
 
-async function getConfig(host) {
+async function getConfig(host, settings) {
 	const rulesFile = await getRules(host);
-	const settings = await getSettings(host);
+	// Optionally, prefetched settings can be passed,
+	// to prevent an extra call to storage.
+	if (settings === undefined) {
+		settings = await getSettings(host);
+	}
 	const categories = constructCategories(rulesFile, settings);
 	const status = getHostStatus(settings);
 

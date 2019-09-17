@@ -18,6 +18,55 @@ describe('apply_utils', function() {
 
 	})
 
+	describe('applyAll', () => {
+
+		it('calls applyCategory for all given categories', () => {
+
+			applyCategory_spy = sinon.spy()
+			apply_utils.__set__('applyCategory', applyCategory_spy)
+
+			const categories = ['cat1', 'cat2']
+			apply_utils.applyAll(categories, 9999)
+
+			assert.equal(applyCategory_spy.callCount, 2)
+			assert.deepEqual(applyCategory_spy.firstCall.args, ['cat1', 9999])
+			assert.deepEqual(applyCategory_spy.secondCall.args, ['cat2', 9999])
+		})
+
+	})
+
+	describe('removeAll', () => {
+
+		it('calls removeCategory for all given categories, with default force=false', () => {
+
+			removeCategory_spy = sinon.spy()
+			apply_utils.__set__('removeCategory', removeCategory_spy)
+
+			const categories = ['cat1', 'cat2']
+			removeAll = apply_utils.__get__('removeAll')
+			removeAll(categories, 9999)
+
+			assert.equal(removeCategory_spy.callCount, 2)
+			assert.deepEqual(removeCategory_spy.firstCall.args, ['cat1', 9999, false])
+			assert.deepEqual(removeCategory_spy.secondCall.args, ['cat2', 9999, false])
+		})
+
+		it('passes on the force argument if given', () => {
+
+			removeCategory_spy = sinon.spy()
+			apply_utils.__set__('removeCategory', removeCategory_spy)
+
+			const categories = ['cat1', 'cat2']
+			removeAll = apply_utils.__get__('removeAll')
+			removeAll(categories, 9999, true)
+
+			assert.equal(removeCategory_spy.callCount, 2)
+			assert.deepEqual(removeCategory_spy.firstCall.args, ['cat1', 9999, true])
+			assert.deepEqual(removeCategory_spy.secondCall.args, ['cat2', 9999, true])
+		})
+
+	})
+
 	describe('applyCategory', function() {
 
 		it('for all rules in the category, it calls applyRule with the same tabId', function() {
@@ -27,7 +76,8 @@ describe('apply_utils', function() {
 			}
 			let spy = sinon.spy()
 			apply_utils.__set__('applyRule', spy)
-			apply_utils.applyCategory(category, 9999);
+			const applyCategory = apply_utils.__get__('applyCategory')
+			applyCategory(category, 9999);
 			assert.equal(spy.callCount, 3)
 			assert.deepEqual(spy.firstCall.args, ['a', 9999])
 			assert.deepEqual(spy.secondCall.args, ['b', 9999])
@@ -41,21 +91,27 @@ describe('apply_utils', function() {
 			}
 			let spy = sinon.spy()
 			apply_utils.__set__('applyRule', spy)
-			apply_utils.applyCategory(category, 9999);
+			const applyCategory = apply_utils.__get__('applyCategory')
+			applyCategory(category, 9999);
 			assert.equal(spy.callCount, 0)
+		})
+
+		it('does call applyRule if the category is not active, but the rules override', function() {
+			const category = {
+				rules: ['a', 'b', 'c'],
+				active: false,
+				overridden: true
+			}
+			let spy = sinon.spy()
+			apply_utils.__set__('applyRule', spy)
+			const applyCategory = apply_utils.__get__('applyCategory')
+			applyCategory(category, 9999);
+			assert.equal(spy.callCount, 3)
 		})
 
 	})
 
 	describe('applyRule', function() {
-
-		it('returns a promise', function() {
-			let applyRule = apply_utils.__get__('applyRule')
-			const rule = {
-				active: false
-			}
-			assert.instanceOf(applyRule(rule, 9999), Promise);
-		})
 
 		it('does not call anything if the rule is not active', function() {
 
@@ -122,8 +178,98 @@ describe('apply_utils', function() {
 
 	describe('removeRule', () => {
 
-		it.skip('todo', () => {
-			assert.fail('finish')
+		it('does not call anything if the rule is active, and force not set', function() {
+
+			let removeCSS_spy = sinon.spy();
+			apply_utils.__set__('removeCSS', removeCSS_spy)
+
+			let removeHide_spy = sinon.spy();
+			apply_utils.__set__('removeHide', removeHide_spy)
+
+			let removeJS_spy = sinon.spy();
+			apply_utils.__set__('removeJS', removeJS_spy)
+
+			const rule = {
+				id: 'my-id',
+				desc: 'my description',
+				js: "window.alert('ding dong')",
+				css: "* {color: red}",
+				hide: "h3",
+				active: true
+			}
+
+			let removeRule = apply_utils.__get__('removeRule')
+			removeRule(rule, 9999);
+			assert.equal(removeCSS_spy.callCount, 0)
+			assert.equal(removeHide_spy.callCount, 0)
+			assert.equal(removeJS_spy.callCount, 0)
+		})
+
+		it('calls all relevant methods if the rule is not active (force not set)', function() {
+
+			let removeCSS_spy = sinon.spy();
+			apply_utils.__set__('removeCSS', removeCSS_spy)
+
+			let removeHide_spy = sinon.spy();
+			apply_utils.__set__('removeHide', removeHide_spy)
+
+			let removeJS_spy = sinon.spy();
+			apply_utils.__set__('removeJS', removeJS_spy)
+
+			const rule = {
+				id: 'my-id',
+				desc: 'my description',
+				js: "window.alert('ding dong')",
+				css: "* {color: red}",
+				hide: "h3",
+				active: false
+			}
+
+			let removeRule = apply_utils.__get__('removeRule')
+			removeRule(rule, 9999);
+
+			assert.equal(removeCSS_spy.callCount, 1)
+			assert.deepEqual(removeCSS_spy.firstCall.args, ["* {color: red}", 9999])
+
+			assert.equal(removeHide_spy.callCount, 1)
+			assert.deepEqual(removeHide_spy.firstCall.args, ["h3", 9999])
+
+			assert.equal(removeJS_spy.callCount, 1)
+			assert.deepEqual(removeJS_spy.firstCall.args, ["window.alert('ding dong')", 9999])
+
+		})
+
+		it('ignores rule status inactive if force=true', () => {
+			let removeCSS_spy = sinon.spy();
+			apply_utils.__set__('removeCSS', removeCSS_spy)
+
+			let removeHide_spy = sinon.spy();
+			apply_utils.__set__('removeHide', removeHide_spy)
+
+			let removeJS_spy = sinon.spy();
+			apply_utils.__set__('removeJS', removeJS_spy)
+
+			const rule = {
+				id: 'my-id',
+				desc: 'my description',
+				js: "window.alert('ding dong')",
+				css: "* {color: red}",
+				hide: "h3",
+				active: true // is active, so in principle should not remove...
+			}
+
+			let removeRule = apply_utils.__get__('removeRule')
+			removeRule(rule, 9999, force=true); // but we force it to remove
+
+			assert.equal(removeCSS_spy.callCount, 1)
+			assert.deepEqual(removeCSS_spy.firstCall.args, ["* {color: red}", 9999])
+
+			assert.equal(removeHide_spy.callCount, 1)
+			assert.deepEqual(removeHide_spy.firstCall.args, ["h3", 9999])
+
+			assert.equal(removeJS_spy.callCount, 1)
+			assert.deepEqual(removeJS_spy.firstCall.args, ["window.alert('ding dong')", 9999])
+
 		})
 
 	})
@@ -166,34 +312,77 @@ describe('apply_utils', function() {
 			assert.notCalled(insertCSS_spy)
 			assert.called(createStylesheet_spy)
 			assert.called(addRuleToStylesheet_spy)
+			assert.calledWith(createStylesheet_spy,  1234)
+			assert.calledWith(addRuleToStylesheet_spy,  'my css', 1234)
 
 		})
 
 
 	})
 
-	// NOTE: won't test createStylesheet() and addRuleToStylesheet() since that would be testing constants (too tightly coupled to 'src')
-
 	describe('removeCSS', () => {
 
-		it.skip('todo', () => {
-			assert.fail('finish')
+		it('removes the css with browser.tabs.removeCSS if function available', () => {
+
+			const removeCSS_spy = sinon.spy()
+			browser_stub.tabs = {
+				removeCSS: removeCSS_spy
+			}
+
+			const removeCSS = apply_utils.__get__('removeCSS');
+			removeCSS('my css', 1234)
+
+			assert.calledWith(removeCSS_spy,  1234, { code: "my css" })
+
+		})
+
+		it('removes the css via the style tag if browser.tabs.removeCSS is not available',async () => {
+
+			browser_stub.tabs = {
+				 // removeCSS is undefined
+			}
+
+			const removeRuleFromStylesheet_spy = sinon.spy()
+			apply_utils.__set__('removeRuleFromStylesheet', removeRuleFromStylesheet_spy);
+
+			const removeCSS = apply_utils.__get__('removeCSS');
+			removeCSS('my css', 1234)
+
+			assert.called(removeRuleFromStylesheet_spy)
+			assert.calledWith(removeRuleFromStylesheet_spy,  'my css', 1234)
+
 		})
 
 	})
 
 	describe('applyHide', () => {
 
-		it.skip('todo', () => {
-			assert.fail('finish')
+		it('calls applyCSS with the appropriate css', () => {
+			const applyCSS_spy = sinon.spy()
+			apply_utils.__set__('applyCSS', applyCSS_spy)
+
+			const applyHide = apply_utils.__get__('applyHide')
+
+			applyHide('h1', 1234)
+
+			assert.calledOnce(applyCSS_spy)
+			assert.calledWith(applyCSS_spy, 'h1 { display: none; }', 1234)
 		})
 
 	})
 
 	describe('removeHide', () => {
 
-		it.skip('todo', () => {
-			assert.fail('finish')
+		it('calls removeCSS with the appropriate css', () => {
+			const removeCSS_spy = sinon.spy()
+			apply_utils.__set__('removeCSS', removeCSS_spy)
+
+			const removeHide = apply_utils.__get__('removeHide')
+
+			removeHide('h1', 1234)
+
+			assert.calledOnce(removeCSS_spy)
+			assert.calledWith(removeCSS_spy, 'h1 { display: none; }', 1234)
 		})
 
 	})
@@ -210,6 +399,46 @@ describe('apply_utils', function() {
 
 		it.skip('todo', () => {
 			assert.fail('finish')
+		})
+
+	})
+
+	describe('applyChanges', () => {
+
+		it('handles a status change', () => {
+
+			const applyChanges = apply_utils.__get__('applyChanges');
+			const applyStatusChange_spy = sinon.spy()
+			apply_utils.__set__('applyStatusChange', applyStatusChange_spy)
+
+			const oldSettings = {}
+			const newSettings = {_status: false}
+
+			applyChanges('my host', oldSettings, newSettings)
+
+			assert.calledOnce(applyStatusChange_spy)
+			assert.calledWith(applyStatusChange_spy, 'my host', newSettings, {old: undefined, new: false})
+
+		})
+
+		it('handles a category change', () => {
+
+			const applyChanges = apply_utils.__get__('applyChanges');
+			const applyCategoryChange_spy = sinon.spy()
+			apply_utils.__set__('applyCategoryChange', applyCategoryChange_spy)
+
+			const oldSettings = {}
+			const newSettings = {
+				_categories: {
+					related: false
+				}
+			}
+
+			applyChanges('my host', oldSettings, newSettings)
+
+			assert.calledOnce(applyCategoryChange_spy)
+			assert.calledWith(applyCategoryChange_spy, 'my host', newSettings, 'related', {old: undefined, new: false})
+
 		})
 
 	})
