@@ -88,3 +88,4 @@ the only way to proper test this is to do some kind of integration tests within 
 	also about:debugging etc: can't use insertCSS I think
 - consider using content scripts to inject / remove CSS, and they communicate with background, which checks for storage changes. This might make porting to Manifest v3 (with Serviceworkers) easier.
 - consider using ES6 modules in the browser (saves webpack compiling). But would rewire() still work?
+- run debug server for `npm run debug` (to serve earth.test etc.)
