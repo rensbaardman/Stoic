@@ -171,7 +171,7 @@ describe('background', function() {
 
 			settings = {
 				"earth.test": {
-					_status: false
+					_status: true
 				}
 			}
 			await driver.setExtensionStorage(settings)
