@@ -1,6 +1,6 @@
 const {getActiveHostname} = require('../utils/url_utils.js')
-const {getRules, getConfig} = require('../utils/rule_utils.js')
-const {getHostStatus, setHostStatus, setCategoryStatus, setRuleStatus, getSettings} = require('../utils/storage_utils.js')
+const {getConfig} = require('../utils/rule_utils.js')
+const {setHostStatus, setCategoryStatus, setRuleStatus, getSettings} = require('../utils/storage_utils.js')
 const {generateBody, generateHeader, generateCategories, generateFooter} = require('./components.js')
 
 
