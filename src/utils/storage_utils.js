@@ -27,12 +27,6 @@ async function setHostStatus(host, status) {
 	browser.storage.local.set(settings)
 }
 
-async function getCategoryStatus(host, id) {
-	const default_response = { '_categories': { [id]: true } };
-	const settings = await browser.storage.local.get({[host]: default_response});
-	return settings[host]['_categories'][id]
-}
-
 async function setCategoryStatus(host, id, status) {
 	const settings = await browser.storage.local.get({ [host]: {} });
 	// The stored settings might not have the _categories object
@@ -53,7 +47,6 @@ async function setRuleStatus(host, id, status) {
 module.exports = {
 	getHostStatus: getHostStatus,
 	setHostStatus: setHostStatus,
-	getCategoryStatus: getCategoryStatus,
 	setCategoryStatus: setCategoryStatus,
 	setRuleStatus: setRuleStatus,
 	getSettings: getSettings

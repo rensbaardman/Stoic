@@ -87,42 +87,6 @@ describe('storage_utils', function() {
 
 	})
 
-	describe('getCategoryStatus', () => {
-
-		it('returns a promise', () => {
-			const settings = { 'some-key': { '_categories': { 'related': true }}}
-			storage_get_stub.resolves(settings)
-			const response = storage_utils.getCategoryStatus('some-key', 'related')
-			assert.instanceOf(response, Promise);
-		})
-
-		it('returns true for non-existing keys', async () => {
-			const expected_arg = { 'non-existing-key.com': { '_categories': { 'related': true }}}
-			storage_get_stub.withArgs(expected_arg).resolves(expected_arg);
-			const status = await storage_utils.getCategoryStatus('non-existing-key.com', 'related')
-			assert.equal(status, true)
-		})
-
-		it('returns saved value for existing keys', async () => {
-			const response = {
-				'some-existing-key.com': {
-					'_status': false,
-					'my-rule': true,
-					'my-other-rule': false,
-					'_categories': {
-						'related': false,
-						'social': true
-					}
-				}
-			}
-			const expected_arg = { 'some-existing-key.com': { '_categories': { 'related': true }}}
-			storage_get_stub.withArgs(expected_arg).resolves(response);
-			const status = await storage_utils.getCategoryStatus('some-existing-key.com', 'related')
-			assert.equal(status, false)
-		})
-
-	})
-
 	describe('setCategoryStatus', () => {
 
 		it('returns an empty promise', async () => {
