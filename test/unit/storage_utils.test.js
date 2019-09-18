@@ -168,6 +168,49 @@ describe('storage_utils', function() {
 
 	})
 
+	describe('setRuleStatus', () => {
+
+		it('returns an empty promise', async () => {
+			storage_get_stub.resolves({'some-example-host.com': {} })
+			const response = storage_utils.setRuleStatus('some-example-host.com', 'hide-related', true)
+			assert.instanceOf(response, Promise);
+			const content = await response;
+			assert.equal(content, undefined)
+		})
+
+		it('saves the new status in storage', async () => {
+			let settings = {
+				'some-example-host.com': {
+				}
+			}
+			storage_get_stub.resolves(settings)
+			await storage_utils.setRuleStatus('some-example-host.com', 'hide-related', false)
+			assert.calledWith(storage_set_stub, {
+				'some-example-host.com': {
+					'hide-related': false
+				}
+			})
+		})
+
+		it('does not delete previous data for the host', async () => {
+			let settings = {
+				'some-example-host.com': {
+					'my-rule': false,
+					'other-rule': true,
+					'_categories': {
+						'logo': false,
+						'stats': true
+					}
+				}
+			}
+			storage_get_stub.resolves(settings)
+			await storage_utils.setRuleStatus('some-example-host.com', 'my-rule', true)
+			settings['some-example-host.com']['my-rule'] = true;
+			assert.calledWith(storage_set_stub, settings)
+		})
+
+	})
+
 	describe('getSettings', () => {
 
 		it('returns a promise', () => {

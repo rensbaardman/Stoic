@@ -44,10 +44,17 @@ async function setCategoryStatus(host, id, status) {
 	browser.storage.local.set(settings)
 }
 
+async function setRuleStatus(host, id, status) {
+	const settings = await browser.storage.local.get({ [host]: {} });
+	settings[host][id] = status;
+	browser.storage.local.set(settings)
+}
+
 module.exports = {
 	getHostStatus: getHostStatus,
 	setHostStatus: setHostStatus,
 	getCategoryStatus: getCategoryStatus,
 	setCategoryStatus: setCategoryStatus,
+	setRuleStatus: setRuleStatus,
 	getSettings: getSettings
 }
