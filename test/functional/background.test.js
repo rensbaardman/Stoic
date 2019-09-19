@@ -152,7 +152,7 @@ describe('background', function() {
 
 	describe('storage settings changes', () => {
 
-		it('handles status setting changes', async () => {
+		it('handles status setting changes (false -> true)', async () => {
 
 			await driver.get('http://earth.test:8080')
 
@@ -162,11 +162,6 @@ describe('background', function() {
 				}
 			}
 			await driver.setExtensionStorage(settings)
-
-			// nothing should be hidden
-			await assertDisplayStatus(driver, '#logo', true)
-			await assertDisplayStatus(driver, '#related', true)
-			await assertDisplayStatus(driver, '#stats', true)
 
 			settings = {
 				"earth.test": {
@@ -179,6 +174,45 @@ describe('background', function() {
 			await assertDisplayStatus(driver, '#logo', false)
 			await assertDisplayStatus(driver, '#related', false)
 			await assertDisplayStatus(driver, '#stats', false)
+
+		})
+
+
+		it('handles status setting changes (true -> false)', async () => {
+
+			await driver.get('http://earth.test:8080')
+
+			let settings = {
+				"earth.test": {
+					_status: true
+				}
+			}
+			await driver.setExtensionStorage(settings)
+
+			settings = {
+				"earth.test": {
+					_status: false
+				}
+			}
+			await driver.setExtensionStorage(settings)
+
+			// rules should be disabled
+			await assertDisplayStatus(driver, '#logo', true)
+			await assertDisplayStatus(driver, '#related', true)
+			await assertDisplayStatus(driver, '#stats', true)
+
+		})
+
+		it('handles status setting reset', async () => {
+
+			await driver.get('http://earth.test:8080')
+
+			let settings = {
+				"earth.test": {
+					_status: false
+				}
+			}
+			await driver.setExtensionStorage(settings)
 
 			// RESET
 			settings = {
