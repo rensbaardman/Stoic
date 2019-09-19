@@ -50,8 +50,18 @@ function statusToggleHandler(host, event) {
 function categoryToggleHandler(host, label, cat_id, event) {
 	toggle(document.getElementById(`cat-${cat_id}`), 'disabled')
 	const input = label.parentElement.children[0]
+	// new status is reversal of current (input) status
 	const new_status = !input.checked;
 	setCategoryStatus(host, cat_id, new_status)
+}
+
+// We .bind() the host, label and rule_id later on,
+// so that it becomes an eventHandler.
+function ruleToggleHandler(host, label, rule_id, event) {
+	const input = label.parentElement.children[0]
+	// new status is reversal of current (input) status
+	const new_status = !input.checked;
+	setRuleStatus(host, rule_id, new_status)
 }
 
 function addToggleHandlers(host) {
@@ -67,7 +77,7 @@ function addToggleHandlers(host) {
 		}
 		else if (label_for.startsWith('rule-')) {
 			const rule_id = label_for.slice(5)
-			// TODO!
+			label.onclick = ruleToggleHandler.bind(null, host, label, rule_id)
 		}
 		else if (label_for.startsWith('cat-')){
 			const cat_id = label_for.slice(4)
