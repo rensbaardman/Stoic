@@ -229,7 +229,7 @@ describe('background', function() {
 
 		})
 
-		it('handles category setting changes', async () => {
+		it('handles category setting changes (false -> true)', async () => {
 
 			await driver.get('http://earth.test:8080')
 
@@ -241,11 +241,6 @@ describe('background', function() {
 				}
 			}
 			await driver.setExtensionStorage(settings)
-
-			// related rule should be disabled, so element shown
-			await assertDisplayStatus(driver, '#logo', false)
-			await assertDisplayStatus(driver, '#related', true)
-			await assertDisplayStatus(driver, '#stats', false)
 
 			settings = {
 				"earth.test": {
@@ -261,17 +256,91 @@ describe('background', function() {
 			await assertDisplayStatus(driver, '#related', false)
 			await assertDisplayStatus(driver, '#stats', false)
 
+		})
+
+		it('handles category setting changes (true -> false)', async () => {
+
+			await driver.get('http://earth.test:8080')
+
+			let settings = {
+				"earth.test": {
+					_categories: {
+						related: true
+					}
+				}
+			}
+			await driver.setExtensionStorage(settings)
+
+			settings = {
+				"earth.test": {
+					_categories: {
+						related: false
+					}
+				}
+			}
+			await driver.setExtensionStorage(settings)
+
+			// rule should be enabled again
+			await assertDisplayStatus(driver, '#logo', false)
+			await assertDisplayStatus(driver, '#related', true)
+			await assertDisplayStatus(driver, '#stats', false)
+
+		})
+
+		it('handles category setting reset', async () => {
+
+			await driver.get('http://earth.test:8080')
+
+			let settings = {
+				"earth.test": {
+					_categories: {
+						related: false
+					}
+				}
+			}
+			await driver.setExtensionStorage(settings)
+
 			// RESET
 			settings = {
 				"earth.test": { }
 			}
 			await driver.setExtensionStorage(settings)
 
-			// rules should be enabled still
+			// rules should be enabled again
 			// (this implicitly assumes that if no cat status is set, it should be active)
 			await assertDisplayStatus(driver, '#logo', false)
 			await assertDisplayStatus(driver, '#related', false)
 			await assertDisplayStatus(driver, '#stats', false)
+
+		})
+
+		it('handles category setting changes depending on _status', async () => {
+
+			await driver.get('http://earth.test:8080')
+
+			let settings = {
+				"earth.test": {
+					_status: false
+				}
+			}
+			await driver.setExtensionStorage(settings)
+
+			settings = {
+				"earth.test": {
+					_status: false,
+					_categories: {
+						related: true
+					}
+				}
+			}
+			await driver.setExtensionStorage(settings)
+
+			// Even though related category has been enabled again,
+			// this should not change anything since site status is disabled
+			// (so all elements should be shown)
+			await assertDisplayStatus(driver, '#logo', true)
+			await assertDisplayStatus(driver, '#related', true)
+			await assertDisplayStatus(driver, '#stats', true)
 
 		})
 
@@ -285,6 +354,7 @@ describe('background', function() {
 				}
 			}
 			await driver.setExtensionStorage(settings)
+			// await driver.sleep(20000000)
 
 			// rule should be disabled, so logo shown
 			await assertDisplayStatus(driver, '#logo', true)
@@ -317,35 +387,7 @@ describe('background', function() {
 
 		})
 
-		it('handles cat changes depending on _status', async () => {
 
-			await driver.get('http://earth.test:8080')
-
-			let settings = {
-				"earth.test": {
-					_status: false
-				}
-			}
-			await driver.setExtensionStorage(settings)
-
-			settings = {
-				"earth.test": {
-					_status: false,
-					_categories: {
-						related: true
-					}
-				}
-			}
-			await driver.setExtensionStorage(settings)
-
-			// Even though related category has been enabled again,
-			// this should not change anything since site status is disabled
-			// (so all elements should be shown)
-			await assertDisplayStatus(driver, '#logo', true)
-			await assertDisplayStatus(driver, '#related', true)
-			await assertDisplayStatus(driver, '#stats', true)
-
-		})
 
 		it('handles rule changes depending on _status', async () => {
 
