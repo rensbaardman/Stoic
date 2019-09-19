@@ -322,7 +322,9 @@ async function getExtensionStorage(settings) {
 
 async function setExtensionStorage(settings) {
 	const script = `browser.storage.local.set(${JSON.stringify(settings)});`
-	return this.executeExtensionScript(script)
+	await this.executeExtensionScript(script);
+	// allow effects to propagate
+	return this.sleep(200);
 }
 
 async function reset_extension_storage() {

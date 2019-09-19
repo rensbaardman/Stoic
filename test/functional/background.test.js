@@ -162,7 +162,6 @@ describe('background', function() {
 				}
 			}
 			await driver.setExtensionStorage(settings)
-			await driver.sleep(200) // allow background script to do its work
 
 			// nothing should be hidden
 			await assertDisplayStatus(driver, '#logo', true)
@@ -175,7 +174,6 @@ describe('background', function() {
 				}
 			}
 			await driver.setExtensionStorage(settings)
-			await driver.sleep(200) // allow background script to do its work
 
 			// rules should be enabled again
 			await assertDisplayStatus(driver, '#logo', false)
@@ -187,7 +185,6 @@ describe('background', function() {
 				"earth.test": { }
 			}
 			await driver.setExtensionStorage(settings)
-			await driver.sleep(200) // allow background script to do its work
 
 			// rules should be enabled still
 			// (this implicitly assumes that if no status is set, it should be active.
@@ -210,7 +207,6 @@ describe('background', function() {
 				}
 			}
 			await driver.setExtensionStorage(settings)
-			await driver.sleep(200) // allow background script to do its work
 
 			// related rule should be disabled, so element shown
 			await assertDisplayStatus(driver, '#logo', false)
@@ -225,7 +221,6 @@ describe('background', function() {
 				}
 			}
 			await driver.setExtensionStorage(settings)
-			await driver.sleep(200) // allow background script to do its work
 
 			// rule should be enabled again
 			await assertDisplayStatus(driver, '#logo', false)
@@ -237,7 +232,6 @@ describe('background', function() {
 				"earth.test": { }
 			}
 			await driver.setExtensionStorage(settings)
-			await driver.sleep(200) // allow background script to do its work
 
 			// rules should be enabled still
 			// (this implicitly assumes that if no cat status is set, it should be active)
@@ -257,7 +251,6 @@ describe('background', function() {
 				}
 			}
 			await driver.setExtensionStorage(settings)
-			await driver.sleep(200) // allow background script to do its work
 
 			// rule should be disabled, so logo shown
 			await assertDisplayStatus(driver, '#logo', true)
@@ -270,7 +263,6 @@ describe('background', function() {
 				}
 			}
 			await driver.setExtensionStorage(settings)
-			await driver.sleep(200) // allow background script to do its work
 
 			// rule should be enabled again
 			await assertDisplayStatus(driver, '#logo', false)
@@ -282,7 +274,6 @@ describe('background', function() {
 				"earth.test": { }
 			}
 			await driver.setExtensionStorage(settings)
-			await driver.sleep(200) // allow background script to do its work
 
 			// rules should be enabled still
 			// (this implicitly assumes that if no rule status is set, it should be active)
@@ -302,7 +293,6 @@ describe('background', function() {
 				}
 			}
 			await driver.setExtensionStorage(settings)
-			await driver.sleep(200) // allow background script to do its work
 
 			settings = {
 				"earth.test": {
@@ -313,7 +303,6 @@ describe('background', function() {
 				}
 			}
 			await driver.setExtensionStorage(settings)
-			await driver.sleep(200) // allow background script to do its work
 
 			// Even though related category has been enabled again,
 			// this should not change anything since site status is disabled
@@ -334,7 +323,6 @@ describe('background', function() {
 				}
 			}
 			await driver.setExtensionStorage(settings)
-			await driver.sleep(200) // allow background script to do its work
 
 			settings = {
 				"earth.test": {
@@ -343,7 +331,6 @@ describe('background', function() {
 				}
 			}
 			await driver.setExtensionStorage(settings)
-			await driver.sleep(200) // allow background script to do its work
 
 			// Even though 'hide-logo' has been enabled again,
 			// this should not change anything since site status is disabled
@@ -366,7 +353,6 @@ describe('background', function() {
 				}
 			}
 			await driver.setExtensionStorage(settings)
-			await driver.sleep(200) // allow background script to do its work
 
 			settings = {
 				"earth.test": {
@@ -377,7 +363,6 @@ describe('background', function() {
 				}
 			}
 			await driver.setExtensionStorage(settings)
-			await driver.sleep(200) // allow background script to do its work
 
 			// Even though 'hide-logo' has been enabled again,
 			// this should not change anything since cat status is disabled
