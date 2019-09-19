@@ -233,6 +233,10 @@ async function applyCategoryChange(host, settings, catId, status) {
 	}
 }
 
+async function applyRuleChange(host, settings, ruleId, status) {
+
+}
+
 module.exports = {
 	applyAll: applyAll,
 	applyChanges: applyChanges
