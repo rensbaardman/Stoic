@@ -24,7 +24,7 @@ describe('background', function() {
 	})
 
 	afterEach(async function() {
-		await driver.reset_extension_storage();
+		await driver.resetExtensionStorage();
 		await driver.safe_close_all_windows();
 	})
 

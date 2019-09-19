@@ -327,7 +327,7 @@ async function setExtensionStorage(settings) {
 	return this.sleep(200);
 }
 
-async function reset_extension_storage() {
+async function resetExtensionStorage() {
 	const script = 'browser.storage.local.clear();'
 	return this.executeExtensionScript(script)
 }
@@ -408,7 +408,7 @@ class ExtendedBuilder extends Builder {
 		driver.executeExtensionScript = executeExtensionScript;
 		driver.getExtensionStorage = getExtensionStorage;
 		driver.setExtensionStorage = setExtensionStorage;
-		driver.reset_extension_storage = reset_extension_storage;
+		driver.resetExtensionStorage = resetExtensionStorage;
 		driver.saveScreenshot = saveScreenshot;
 		return driver;
 	}
