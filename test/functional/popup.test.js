@@ -159,7 +159,7 @@ describe('popup', function() {
 
 		})
 
-		it('has only on <head></head> element', async () => {
+		it('has only one <head></head> element', async () => {
 
 			await driver.open_popup();
 			await driver.mock_url('https://www.earth.test/');
@@ -169,7 +169,17 @@ describe('popup', function() {
 
 		})
 
+		it('checks the settings to determine status', () => {
+			assert.fail('TODO')
+		})
 
+		it('checks the settings to determine category status', () => {
+			assert.fail('TODO')
+		})
+
+		it('checks the settings to determine rule status', () => {
+			assert.fail('TODO')
+		})
 
 	})
 
@@ -186,24 +196,21 @@ describe('popup', function() {
 
 		})
 
-		it('saves the popup status', async () => {
+		it('enables the popup when clicking the status-toggle again', async () => {
 
 			await driver.open_popup();
-			await driver.mock_url('https://earth.test')
 
-			let label = await driver.findElement(By.css('label[for="toggle-status"]'))
+			let label = await driver.wait(until.elementLocated(By.css('label[for="toggle-status"]')));
 			// toggle to 'disabled'
 			await label.click();
 
-			await driver.mock_url('https://moon.test')
-			await driver.mock_url('https://earth.test')
-
-			// should have saved the state after refresh
-			await assert_popup_status(driver, 'disabled')
+			// enable again
+			await label.click();
+			await assert_popup_status(driver, 'active')
 
 		})
 
-		it('saves the popup status in storage', async () => {
+		it('saves the status in storage (to disabled)', async () => {
 
 			await driver.open_popup();
 			await driver.mock_url('https://earth.test')
@@ -222,22 +229,9 @@ describe('popup', function() {
 
 			assert.deepEqual(settings, expected_settings)
 
-			// and ENABLE again
-
-			label = await driver.findElement(By.css('label[for="toggle-status"]'))
-			// toggle to 'enabled'
-			await label.click();
-
-			expected_settings = {
-				'earth.test': {
-					_status: true
-				}
-			}
-			assert.deepEqual(settings, expected_settings)
-
 		})
 
-		it("doesn't leak the disabled state to other sites", async () => {
+		it('saves the status in storage (to enabled)', async () => {
 
 			await driver.open_popup();
 			await driver.mock_url('https://earth.test')
@@ -246,10 +240,18 @@ describe('popup', function() {
 			// toggle to 'disabled'
 			await label.click();
 
-			await driver.mock_url('https://moon.test')
-			// setting earth.test to disabled shouldn't have set
-			// moon.test to disabled
-			await assert_popup_status(driver, 'active')
+			label = await driver.findElement(By.css('label[for="toggle-status"]'))
+			// toggle to 'enabled'
+			await label.click();
+
+			const settings = await driver.getExtensionStorage();
+
+			const expected_settings = {
+				'earth.test': {
+					_status: true
+				}
+			}
+			assert.deepEqual(settings, expected_settings)
 
 		})
 
@@ -257,7 +259,7 @@ describe('popup', function() {
 
 	describe('saving category status', () => {
 
-		it('changes category status on toggle', async function() {
+		it('changes category status on toggle (disable)', async function() {
 
 			await driver.open_popup();
 			await driver.mock_url('https://earth.test');
@@ -270,7 +272,7 @@ describe('popup', function() {
 
 		})
 
-		it('saves the category status', async function() {
+		it('changes category status on toggle (enable)', async function() {
 
 			await driver.open_popup();
 			await driver.mock_url('https://earth.test');
@@ -278,16 +280,15 @@ describe('popup', function() {
 			let related_toggle = await driver.wait(until.elementLocated(By.css('label[for="toggle-cat-related"]')));
 			await related_toggle.click();
 
-			await driver.mock_url('https://moon.test')
-			await driver.mock_url('https://earth.test')
+			// enable again
+			await related_toggle.click();
 
-			// category 'related' should still be be disabled
-			await assert_category_status(driver, 'related', 'disabled')
+			// category 'related' should be disabled
+			await assert_category_status(driver, 'related', 'active')
 
 		})
 
-
-		it('saves the category status in storage', async () => {
+		it('saves the category status in storage (disable)', async () => {
 
 			await driver.open_popup();
 			await driver.mock_url('https://earth.test')
@@ -308,13 +309,22 @@ describe('popup', function() {
 
 			assert.deepEqual(settings, expected_settings)
 
-			// and ENABLE again
+		})
 
-			label = await driver.findElement(By.css('label[for="toggle-cat-related"]'))
+		it('saves the category status in storage (enable)', async () => {
+
+			await driver.open_popup();
+			await driver.mock_url('https://earth.test')
+
+			let label = await driver.findElement(By.css('label[for="toggle-cat-related"]'))
+			// toggle to 'disabled'
+			await label.click();
+
 			// toggle to 'enabled'
 			await label.click();
 
-			expected_settings = {
+			const settings = await driver.getExtensionStorage();
+			const expected_settings = {
 				'earth.test': {
 					_categories: {
 						related: true
@@ -325,37 +335,16 @@ describe('popup', function() {
 
 		})
 
-		it("doesn't leak the category state to other sites", async () => {
-
-			await driver.open_popup();
-			await driver.mock_url('https://earth.test');
-
-			let related_toggle = await driver.wait(until.elementLocated(By.css('label[for="toggle-cat-related"]')));
-			await related_toggle.click();
-
-			// we us mock-url since it _does_ have the category
-			// 'related' defined
-			await driver.mock_url('https://moon.test')
-			// category 'related' should NOT be disabled
-			await assert_category_status(driver, 'related', 'active')
-
-		})
-
 	})
 
 
 	describe('saving rule status', () => {
 
-		it.skip('changes rule status on toggle', async function() {
-			assert.fail('todo')
+		it('changes rule status on toggle', async function() {
+			assert.fail('TODO')
 		})
 
-		it.skip('saves the rule status', async function() {
-			assert.fail('todo')
-		})
-
-
-		it.skip('saves the rule status in storage', async () => {
+		it('saves the rule status in storage (disable)', async () => {
 
 			await driver.open_popup();
 			await driver.mock_url('https://earth.test')
@@ -379,17 +368,27 @@ describe('popup', function() {
 
 			assert.deepEqual(settings, expected_settings)
 
-			// and ENABLE again
+		})
 
-			// open again
-			cat = await driver.findElement(By.css('#cat-related'))
+		it('saves the rule status in storage (enable)', async () => {
+
+			await driver.open_popup();
+			await driver.mock_url('https://earth.test')
+
+			// category needs to be open to be able to click on the rule label
+			// (else the label is not visible)
+			let cat = await driver.findElement(By.css('#cat-related'))
 			await cat.click()
 
-			label = await driver.findElement(By.css('label[for="toggle-rule-hide-related-links"]'))
-			// toggle to 'enabled'
+			let label = await driver.findElement(By.css('label[for="toggle-rule-hide-related-links"]'))
+			// toggle to 'disabled'
 			await label.click();
 
-			expected_settings = {
+			// and ENABLE again
+			await label.click();
+
+			const settings = await driver.getExtensionStorage();
+			const expected_settings = {
 				'earth.test': {
 					'hide-related-links': true
 				}
@@ -398,99 +397,28 @@ describe('popup', function() {
 
 		})
 
-		it.skip("doesn't leak the rule state to other sites", async function() {
-			assert.fail('todo')
+		it.skip('correctly shows override status [on cat, on rule?] (cat disabled)', async function() {
+			assert.fail('TODO')
 		})
 
-		it.skip('correctly shows override status', async function() {
-			assert.fail('todo')
+		it.skip('correctly shows override status [on cat, on rule?] (cat enabled)', async function() {
+			assert.fail('TODO')
 		})
 
 		it.skip('has the ability to reset a rule to follow the parent category', async function() {
-			assert.fail('todo')
+			assert.fail('TODO')
 		})
 
 		it.skip('correctly resets the rule to follow the parent category', async function() {
-			assert.fail('todo')
+			assert.fail('TODO')
+		})
+
+		it.skip('saves the resets to storage', async function() {
+			assert.fail('TODO')
 		})
 
 		it.skip('correctly disables the override status after rule reset', async function() {
-			assert.fail('todo')
-		})
-
-	})
-
-
-	describe('storage', () => {
-
-		it.skip("doesn't override previous values when setting new values", async () => {
-
-			await driver.open_popup();
-			await driver.mock_url('https://earth.test')
-
-			let label = await driver.findElement(By.css('label[for="toggle-status"]'))
-			// toggle to 'disabled'
-			await label.click();
-
-			label = await driver.findElement(By.css('label[for="toggle-cat-related"]'))
-			// toggle to 'disabled'
-			await label.click();
-
-			// category needs to be open to be able to click on the rule label
-			// (else the label is not visible)
-			let cat = await driver.findElement(By.css('#cat-related'))
-			await cat.click()
-
-			label = await driver.findElement(By.css('label[for="toggle-rule-hide-related-links"]'))
-			// toggle to 'disabled'
-			await label.click();
-
-			label = await driver.findElement(By.css('label[for="toggle-cat-logo"]'))
-			// toggle to 'disabled'
-			await label.click();
-
-			label = await driver.findElement(By.css('label[for="toggle-cat-related"]'))
-			// toggle to 'ENABLED' again
-			await label.click();
-
-			label = await driver.findElement(By.css('label[for="toggle-rule-hide-related-links"]'))
-			// toggle to 'ENABLED' again
-			await label.click();
-
-			// category needs to be open to be able to click on the rule label
-			// (else the label is not visible)
-			cat = await driver.findElement(By.css('#cat-stats'))
-			await cat.click()
-
-			label = await driver.findElement(By.css('label[for="toggle-rule-hide-statistics"]'))
-			// toggle to 'disabled'
-			await label.click();
-
-			label = await driver.findElement(By.css('label[for="toggle-status"]'))
-			// toggle to 'enabled' again
-			await label.click();
-
-			label = await driver.findElement(By.css('label[for="toggle-rule-hide-related-links"]'))
-			// toggle to 'enabled' again
-			await label.click();
-
-			const settings = await driver.getExtensionStorage();
-
-			const expected_settings = {
-				'earth.test': {
-					_status: true,
-					_categories: {
-						related: true,
-						logo: false
-					},
-					'hide-related-links': true,
-					'hide-statistics': false
-				}
-			}
-
-			// should have saved the state after refresh
-			assert.deepEqual(settings, expected_settings)
-
+			assert.fail('TODO')
 		})
 
 	})
