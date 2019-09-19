@@ -577,9 +577,9 @@ describe('apply_utils', function() {
 
 	})
 
-	describe.only('applyStatusChange', () => {
+	describe('applyStatusChange', () => {
 
-		it('removes all rules when new status is false', () => {
+		it('removes all rules when new status is false', async () => {
 
 			const applyStatusChange = apply_utils.__get__('applyStatusChange')
 
@@ -588,8 +588,10 @@ describe('apply_utils', function() {
 			getConfigMock.resolves({categories: categoriesMock})
 			apply_utils.__set__('getConfig', getConfigMock)
 
+			const host = 'my-host.com'
+			const tabId = 1234
 			const browserTabsQueryMock = sinon.stub()
-			browserTabsQueryMock.resolves([{id: 1234}])
+			browserTabsQueryMock.resolves([{id: tabId}])
 
 			// somehow I can't get browser_stub to work here...
 			const browserStub = { tabs: {
@@ -598,8 +600,7 @@ describe('apply_utils', function() {
 
 			apply_utils.__set__('browser', browserStub)
 
-			const host = 'my-host.com'
-			const tabId = '1234'
+
 
 			const newSettings = {
 				_status: false
@@ -612,7 +613,7 @@ describe('apply_utils', function() {
 			let removeAllSpy = sinon.spy();
 			apply_utils.__set__('removeAll', removeAllSpy)
 
-			applyStatusChange(host, newSettings, status)
+			await applyStatusChange(host, newSettings, status)
 
 			assert.calledOnce(removeAllSpy)
 			assert.calledWith(removeAllSpy, categoriesMock, tabId, force=true)
