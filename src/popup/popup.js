@@ -4,7 +4,7 @@ const {setHostStatus, setCategoryStatus, setRuleStatus, getSettings} = require('
 const {generateBody, generateHeader, generateCategories, generateFooter} = require('./components.js')
 
 
-function toggle(el, className) {
+function toggleClass(el, className) {
 	if (el.classList.contains(className)) {
 		el.classList.remove(className)
 	}
@@ -23,7 +23,7 @@ function addCategoryOpenHandlers() {
 			// label.onclick with event.stopPropagation(), but somehow
 			// this doesn't work)
 			if (['li', 'div', 'h3'].includes(target_name))  {
-				toggle(category, 'opened')
+				toggleClass(category, 'opened')
 			}
 		}
 	}
@@ -32,7 +32,7 @@ function addCategoryOpenHandlers() {
 // We .bind() the host later on,
 // so that it becomes an eventHandler.
 function statusToggleHandler(host, event) {
-	toggle(document.body, 'disabled');
+	toggleClass(document.body, 'disabled');
 
 	let status = document.getElementById('status');
 	if (status.innerText === 'active') {
@@ -48,7 +48,7 @@ function statusToggleHandler(host, event) {
 // We .bind() the host, label and cat_id later on,
 // so that it becomes an eventHandler.
 function categoryToggleHandler(host, label, cat_id, event) {
-	toggle(document.getElementById(`cat-${cat_id}`), 'disabled')
+	toggleClass(document.getElementById(`cat-${cat_id}`), 'disabled')
 	const input = label.parentElement.children[0]
 	// new status is reversal of current (input) status
 	const new_status = !input.checked;
