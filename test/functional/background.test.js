@@ -289,6 +289,12 @@ describe('background', function() {
 
 		it('handles category setting reset', async () => {
 
+			// TODO: consider whether this is even a relevant case
+			// (because there is no default status such as a parent,
+			// resetting it should not be necessary. On the other hand,
+			// enforcing possibility to reset possibly makes the logic
+			// more uniform!)
+
 			await driver.get('http://earth.test:8080')
 
 			let settings = {
