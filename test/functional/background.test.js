@@ -350,7 +350,7 @@ describe('background', function() {
 
 		})
 
-		it('handles rule setting changes', async () => {
+		it('handles rule setting changes (false -> true)', async () => {
 
 			await driver.get('http://earth.test:8080')
 
@@ -360,12 +360,6 @@ describe('background', function() {
 				}
 			}
 			await driver.setExtensionStorage(settings)
-			// await driver.sleep(20000000)
-
-			// rule should be disabled, so logo shown
-			await assertDisplayStatus(driver, '#logo', true)
-			await assertDisplayStatus(driver, '#related', false)
-			await assertDisplayStatus(driver, '#stats', false)
 
 			settings = {
 				"earth.test": {
@@ -379,13 +373,52 @@ describe('background', function() {
 			await assertDisplayStatus(driver, '#related', false)
 			await assertDisplayStatus(driver, '#stats', false)
 
+		})
+
+		it('handles rule setting changes (true -> false)', async () => {
+
+			await driver.get('http://earth.test:8080')
+
+			let settings = {
+				"earth.test": {
+					'hide-logo': true
+				}
+			}
+			await driver.setExtensionStorage(settings)
+
+			settings = {
+				"earth.test": {
+					'hide-logo': false
+				}
+			}
+			await driver.setExtensionStorage(settings)
+
+			// rule should be enabled again
+			await assertDisplayStatus(driver, '#logo', true)
+			await assertDisplayStatus(driver, '#related', false)
+			await assertDisplayStatus(driver, '#stats', false)
+
+		})
+
+
+		it('handles rule setting reset', async () => {
+
+			await driver.get('http://earth.test:8080')
+
+			let settings = {
+				"earth.test": {
+					'hide-logo': false
+				}
+			}
+			await driver.setExtensionStorage(settings)
+
 			// RESET
 			settings = {
 				"earth.test": { }
 			}
 			await driver.setExtensionStorage(settings)
 
-			// rules should be enabled still
+			// rules should be enabled again
 			// (this implicitly assumes that if no rule status is set, it should be active)
 			await assertDisplayStatus(driver, '#logo', false)
 			await assertDisplayStatus(driver, '#related', false)
@@ -393,9 +426,7 @@ describe('background', function() {
 
 		})
 
-
-
-		it('handles rule changes depending on _status', async () => {
+		it('handles rule setting changes depending on _status', async () => {
 
 			await driver.get('http://earth.test:8080')
 
@@ -446,12 +477,42 @@ describe('background', function() {
 			}
 			await driver.setExtensionStorage(settings)
 
-			// Even though 'hide-logo' has been enabled again,
+			// Even though 'hide-related-links' has been enabled again,
 			// this should not change anything since cat status is disabled
-			// (so all elements should be shown)
-			await assertDisplayStatus(driver, '#logo', true)
+			// (so related links should be shown)
+			await assertDisplayStatus(driver, '#logo', false)
 			await assertDisplayStatus(driver, '#related', true)
-			await assertDisplayStatus(driver, '#stats', true)
+			await assertDisplayStatus(driver, '#stats', false)
+		})
+
+		it('handles rule changes depending on cat status (override)', async () => {
+
+			await driver.get('http://earth.test:8080')
+
+			let settings = {
+				"earth.test": {
+					_categories: {
+						related: true
+					}
+				}
+			}
+			await driver.setExtensionStorage(settings)
+
+			settings = {
+				"earth.test": {
+					_categories: {
+						related: true
+					},
+					'hide-related-links': false
+				}
+			}
+			await driver.setExtensionStorage(settings)
+
+			// Now 'hide-related-links' is disabled,
+			// and it should override the cat status
+			await assertDisplayStatus(driver, '#logo', false)
+			await assertDisplayStatus(driver, '#related', true)
+			await assertDisplayStatus(driver, '#stats', false)
 		})
 
 	})
