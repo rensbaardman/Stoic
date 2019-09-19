@@ -22,3 +22,6 @@ css rules of the form '<something> { display: none; }' should give a warning to 
 
 maybe:
 - alfabetic order? (for categories? For rules?)
+
+(future)
+- JS: there should be an 'enable', 'disable' object which counteract each other

@@ -121,13 +121,9 @@ describe('apply_utils', function() {
 			let applyHide_spy = sinon.spy();
 			apply_utils.__set__('applyHide', applyHide_spy)
 
-			let applyJS_spy = sinon.spy();
-			apply_utils.__set__('applyJS', applyJS_spy)
-
 			const rule = {
 				id: 'my-id',
 				desc: 'my description',
-				js: "window.alert('ding dong')",
 				css: "* {color: red}",
 				hide: "h3",
 				active: false
@@ -137,7 +133,6 @@ describe('apply_utils', function() {
 			applyRule(rule, 9999);
 			assert.equal(applyCSS_spy.callCount, 0)
 			assert.equal(applyHide_spy.callCount, 0)
-			assert.equal(applyJS_spy.callCount, 0)
 		})
 
 		it('calls all relevant methods if the rule is active', function() {
@@ -148,13 +143,9 @@ describe('apply_utils', function() {
 			let applyHide_spy = sinon.spy();
 			apply_utils.__set__('applyHide', applyHide_spy)
 
-			let applyJS_spy = sinon.spy();
-			apply_utils.__set__('applyJS', applyJS_spy)
-
 			const rule = {
 				id: 'my-id',
 				desc: 'my description',
-				js: "window.alert('ding dong')",
 				css: "* {color: red}",
 				hide: "h3",
 				active: true
@@ -168,9 +159,6 @@ describe('apply_utils', function() {
 
 			assert.equal(applyHide_spy.callCount, 1)
 			assert.deepEqual(applyHide_spy.firstCall.args, ["h3", 9999])
-
-			assert.equal(applyJS_spy.callCount, 1)
-			assert.deepEqual(applyJS_spy.firstCall.args, ["window.alert('ding dong')", 9999])
 
 		})
 
@@ -186,13 +174,9 @@ describe('apply_utils', function() {
 			let removeHide_spy = sinon.spy();
 			apply_utils.__set__('removeHide', removeHide_spy)
 
-			let removeJS_spy = sinon.spy();
-			apply_utils.__set__('removeJS', removeJS_spy)
-
 			const rule = {
 				id: 'my-id',
 				desc: 'my description',
-				js: "window.alert('ding dong')",
 				css: "* {color: red}",
 				hide: "h3",
 				active: true
@@ -202,7 +186,6 @@ describe('apply_utils', function() {
 			removeRule(rule, 9999);
 			assert.equal(removeCSS_spy.callCount, 0)
 			assert.equal(removeHide_spy.callCount, 0)
-			assert.equal(removeJS_spy.callCount, 0)
 		})
 
 		it('calls all relevant methods if the rule is not active (force not set)', function() {
@@ -213,13 +196,9 @@ describe('apply_utils', function() {
 			let removeHide_spy = sinon.spy();
 			apply_utils.__set__('removeHide', removeHide_spy)
 
-			let removeJS_spy = sinon.spy();
-			apply_utils.__set__('removeJS', removeJS_spy)
-
 			const rule = {
 				id: 'my-id',
 				desc: 'my description',
-				js: "window.alert('ding dong')",
 				css: "* {color: red}",
 				hide: "h3",
 				active: false
@@ -234,9 +213,6 @@ describe('apply_utils', function() {
 			assert.equal(removeHide_spy.callCount, 1)
 			assert.deepEqual(removeHide_spy.firstCall.args, ["h3", 9999])
 
-			assert.equal(removeJS_spy.callCount, 1)
-			assert.deepEqual(removeJS_spy.firstCall.args, ["window.alert('ding dong')", 9999])
-
 		})
 
 		it('ignores rule status inactive if force=true', () => {
@@ -246,13 +222,9 @@ describe('apply_utils', function() {
 			let removeHide_spy = sinon.spy();
 			apply_utils.__set__('removeHide', removeHide_spy)
 
-			let removeJS_spy = sinon.spy();
-			apply_utils.__set__('removeJS', removeJS_spy)
-
 			const rule = {
 				id: 'my-id',
 				desc: 'my description',
-				js: "window.alert('ding dong')",
 				css: "* {color: red}",
 				hide: "h3",
 				active: true // is active, so in principle should not remove...
@@ -266,9 +238,6 @@ describe('apply_utils', function() {
 
 			assert.equal(removeHide_spy.callCount, 1)
 			assert.deepEqual(removeHide_spy.firstCall.args, ["h3", 9999])
-
-			assert.equal(removeJS_spy.callCount, 1)
-			assert.deepEqual(removeJS_spy.firstCall.args, ["window.alert('ding dong')", 9999])
 
 		})
 
@@ -383,22 +352,6 @@ describe('apply_utils', function() {
 
 			assert.calledOnce(removeCSS_spy)
 			assert.calledWith(removeCSS_spy, 'h1 { display: none; }', 1234)
-		})
-
-	})
-
-	describe('applyJS', () => {
-
-		it.skip('todo', () => {
-			assert.fail('finish')
-		})
-
-	})
-
-	describe('removeJS', () => {
-
-		it.skip('todo', () => {
-			assert.fail('finish')
 		})
 
 	})

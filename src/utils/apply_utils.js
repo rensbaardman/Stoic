@@ -39,10 +39,6 @@ function applyRule(rule, tabId) {
 		applyHide(rule.hide, tabId)
 	}
 
-	if (rule.js !== undefined) {
-		applyJS(rule.js, tabId)
-	}
-
 }
 
 function removeRule(rule, tabId, force = false) {
@@ -159,11 +155,6 @@ function removeHide(selector, tabId) {
 	const css = `${selector} { display: none; }`;
 	return removeCSS(css, tabId);
 }
-
-
-function applyJS(src, tabId) {}
-
-function removeJS(src, tabId) {}
 
 
 function applyChanges(host, oldSettings, newSettings) {
